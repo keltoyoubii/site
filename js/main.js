@@ -106,6 +106,16 @@
     });
   });
 
+  /* -------------------- Titres en masque (lignes) -------------------- */
+  document.querySelectorAll("[data-line]").forEach((el) => {
+    const ins = el.querySelectorAll(".line__in");
+    gsap.set(ins, { yPercent: 110 });
+    ScrollTrigger.create({
+      trigger: el, start: "top 85%", once: true,
+      onEnter: () => gsap.to(ins, { yPercent: 0, duration: 1, ease: "expo.out", stagger: 0.1 }),
+    });
+  });
+
   /* -------------------- Reveals simples -------------------- */
   document.querySelectorAll("[data-reveal]").forEach((el) => {
     ScrollTrigger.create({ trigger: el, start: "top 88%", once: true, onEnter: () => el.classList.add("is-revealed") });

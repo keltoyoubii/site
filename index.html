@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>MaëlDan — Réalisateur & Designer visuel</title>
-  <meta name="description" content="MaëlDan — Réalisateur, motion designer et designer visuel. Films d'entreprise, clips, motion design, identités visuelles, photographie et projets artistiques." />
+  <title>Maëldan — Réalisateur & Designer visuel</title>
+  <meta name="description" content="Maëldan — Réalisateur, motion designer et designer visuel. Films d'entreprise, clips, motion design, identités visuelles, photographie et projets artistiques." />
 
-  <meta property="og:title" content="MaëlDan — Réalisateur & Designer visuel" />
+  <meta property="og:title" content="Maëldan — Réalisateur & Designer visuel" />
   <meta property="og:description" content="Direction artistique, vidéo, motion design, photographie et graphisme." />
   <meta property="og:type" content="website" />
 
-  <!-- Display fort (Bricolage Grotesque) + sans neutre (Archivo) -->
+  <!-- Inter (sans, structurel) + Newsreader italique (serif, accents éditoriaux) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Newsreader:ital,wght@1,300;1,400;1,500&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
   <!-- ============================ NAV ============================ -->
   <header class="nav" id="nav">
-    <a href="#accueil" class="nav__brand">MaëlDan<sup>®</sup></a>
+    <a href="#accueil" class="nav__brand">Maëldan<sup>®</sup></a>
     <nav class="nav__links" aria-label="Navigation principale">
       <a href="#travaux"><span>01</span> Travaux</a>
       <a href="#apropos"><span>02</span> À propos</a>
@@ -32,8 +32,6 @@
     <!-- ====================== ACCUEIL / SHOWREEL ====================== -->
     <section class="hero" id="accueil">
       <div class="hero__media" data-parallax>
-        <!-- Showreel : démarre immédiatement, muet, en boucle.
-             TODO: déposer videos/showreel.mp4 — en attendant, le poster s'affiche. -->
         <video class="hero__video" autoplay muted loop playsinline preload="metadata"
           poster="https://picsum.photos/seed/maeldan-showreel-cinematic/1920/1080">
           <source src="videos/showreel.mp4" type="video/mp4" />
@@ -41,13 +39,11 @@
         <div class="hero__scrim" aria-hidden="true"></div>
       </div>
 
-      <h1 class="hero__title" aria-label="MaëlDan">
-        <span class="line"><span class="line__in">Maël</span></span>
-        <span class="line"><span class="line__in">Dan<sup>®</sup></span></span>
-      </h1>
-
       <div class="hero__foot">
-        <p class="hero__role">Réalisateur, motion designer<br />&amp; designer visuel</p>
+        <div class="hero__id">
+          <h1 class="hero__title"><span class="line"><span class="line__in">Maëldan</span></span></h1>
+          <p class="hero__role"><em>Réalisateur, motion designer &amp; designer visuel</em></p>
+        </div>
         <a href="#travaux" class="hero__scroll">
           <span>Voir les travaux</span>
           <span class="hero__scroll-arrow" aria-hidden="true">↓</span>
@@ -55,18 +51,20 @@
       </div>
     </section>
 
-    <!-- ====================== MARQUEE (une seule, identité) ====================== -->
+    <!-- ====================== MARQUEE ====================== -->
     <div class="marquee" aria-hidden="true">
       <div class="marquee__track">
-        <span>Vidéo — Motion — Graphisme — Photographie — Direction artistique — </span>
-        <span>Vidéo — Motion — Graphisme — Photographie — Direction artistique — </span>
+        <span>Vidéo <em>—</em> Motion <em>—</em> Graphisme <em>—</em> Photographie <em>—</em> Direction artistique <em>—</em>&nbsp;</span>
+        <span>Vidéo <em>—</em> Motion <em>—</em> Graphisme <em>—</em> Photographie <em>—</em> Direction artistique <em>—</em>&nbsp;</span>
       </div>
     </div>
 
     <!-- ====================== TRAVAUX ====================== -->
     <section class="works" id="travaux">
       <div class="works__head">
-        <h2 class="works__title" data-split>Travaux sélectionnés</h2>
+        <h2 class="works__title" data-line>
+          <span class="line"><span class="line__in">Travaux <em>sélectionnés</em></span></span>
+        </h2>
         <div class="filter" role="tablist" aria-label="Filtrer les travaux">
           <button class="filter__btn is-active" data-filter="all" role="tab" aria-selected="true">Tout</button>
           <button class="filter__btn" data-filter="video" role="tab" aria-selected="false">Vidéo</button>
@@ -79,35 +77,48 @@
       <div class="grid" id="grid"><!-- généré depuis js/projects.js --></div>
     </section>
 
-    <!-- ====================== À PROPOS ====================== -->
+    <!-- ====================== À PROPOS (texte qui gravite autour du portrait) ====================== -->
     <section class="about" id="apropos">
-      <p class="about__lead" data-split>
-        Je développe depuis plusieurs années une pratique de l'image à travers la
-        vidéo, le motion design, la photographie et le graphisme.
-      </p>
-      <div class="about__body">
-        <p class="about__text" data-reveal>
-          J'interviens aussi bien sur des projets artistiques que sur des commandes
-          pour des entreprises, institutions, associations ou particuliers. Chaque
-          projet est abordé avec la même attention portée à la narration, au rythme
-          et à la fabrication des images.
+      <div class="about__inner">
+        <figure class="about__portrait">
+          <!-- TODO: remplacer par ta vraie photo (portrait, 3:4) -->
+          <img src="https://picsum.photos/seed/maeldan-portrait/900/1200" alt="Portrait de Maëldan" loading="lazy" />
+        </figure>
+
+        <p class="about__meta"><em>(Portrait)</em></p>
+
+        <p class="about__lead" data-split>
+          Je développe depuis plusieurs années une pratique de l'image à travers la vidéo, le motion design, la photographie et le graphisme.
         </p>
-        <ol class="about__services" data-reveal aria-label="Services">
-          <li>Films d'entreprise</li>
-          <li>Contenus événementiels</li>
-          <li>Clips musicaux</li>
-          <li>Projets culturels</li>
-          <li>Identités visuelles</li>
-          <li>Animations</li>
-          <li>Supports de communication</li>
-        </ol>
+
+        <div class="about__text" data-reveal>
+          <p>
+            J'interviens aussi bien sur des projets artistiques que sur des commandes
+            pour des entreprises, institutions, associations ou particuliers. Chaque
+            projet est abordé avec la même attention portée à <em>la narration, au
+            rythme et à la fabrication des images</em>.
+          </p>
+        </div>
+
+        <div class="about__services" data-reveal>
+          <p class="about__services-label"><em>Services</em></p>
+          <ol aria-label="Services">
+            <li>Films d'entreprise</li>
+            <li>Contenus événementiels</li>
+            <li>Clips musicaux</li>
+            <li>Projets culturels</li>
+            <li>Identités visuelles</li>
+            <li>Animations</li>
+            <li>Supports de communication</li>
+          </ol>
+        </div>
       </div>
     </section>
   </main>
 
   <!-- ====================== CONTACT (ligne discrète) ====================== -->
   <footer class="contact" id="contact">
-    <span class="contact__txt">Contact</span>
+    <span class="contact__txt"><em>Contact</em></span>
     <a class="contact__mail" href="mailto:hello@maeldan.com">hello@maeldan.com</a>
     <span class="contact__year"></span>
   </footer>
