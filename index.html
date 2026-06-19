@@ -6,26 +6,25 @@
   <title>MaëlDan — Réalisateur & Designer visuel</title>
   <meta name="description" content="MaëlDan — Réalisateur, motion designer et designer visuel. Films d'entreprise, clips, motion design, identités visuelles, photographie et projets artistiques." />
 
-  <!-- Open Graph -->
   <meta property="og:title" content="MaëlDan — Réalisateur & Designer visuel" />
   <meta property="og:description" content="Direction artistique, vidéo, motion design, photographie et graphisme." />
   <meta property="og:type" content="website" />
 
-  <!-- Fonts: Space Grotesk (display) + Archivo (body) — recommandé par ui-ux-pro-max -->
+  <!-- Display fort (Bricolage Grotesque) + sans neutre (Archivo) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <!-- ====================== NAV (discret, une ligne) ====================== -->
+  <!-- ============================ NAV ============================ -->
   <header class="nav" id="nav">
-    <a href="#accueil" class="nav__brand">MaëlDan</a>
+    <a href="#accueil" class="nav__brand">MaëlDan<sup>®</sup></a>
     <nav class="nav__links" aria-label="Navigation principale">
-      <a href="#travaux">Travaux</a>
-      <a href="#apropos">À propos</a>
-      <a href="#contact">Contact</a>
+      <a href="#travaux"><span>01</span> Travaux</a>
+      <a href="#apropos"><span>02</span> À propos</a>
+      <a href="#contact"><span>03</span> Contact</a>
     </nav>
   </header>
 
@@ -33,33 +32,41 @@
     <!-- ====================== ACCUEIL / SHOWREEL ====================== -->
     <section class="hero" id="accueil">
       <div class="hero__media" data-parallax>
-        <!-- Le showreel démarre immédiatement (muet, en boucle).
-             TODO: déposer le fichier dans videos/showreel.mp4 — en attendant, le poster s'affiche avec un léger zoom. -->
-        <video
-          class="hero__video"
-          autoplay muted loop playsinline preload="metadata"
+        <!-- Showreel : démarre immédiatement, muet, en boucle.
+             TODO: déposer videos/showreel.mp4 — en attendant, le poster s'affiche. -->
+        <video class="hero__video" autoplay muted loop playsinline preload="metadata"
           poster="https://picsum.photos/seed/maeldan-showreel-cinematic/1920/1080">
           <source src="videos/showreel.mp4" type="video/mp4" />
         </video>
         <div class="hero__scrim" aria-hidden="true"></div>
       </div>
 
-      <div class="hero__content">
-        <h1 class="hero__title">MaëlDan</h1>
-        <p class="hero__role">Réalisateur, motion designer<br />et designer visuel</p>
-      </div>
+      <h1 class="hero__title" aria-label="MaëlDan">
+        <span class="line"><span class="line__in">Maël</span></span>
+        <span class="line"><span class="line__in">Dan<sup>®</sup></span></span>
+      </h1>
 
-      <a href="#travaux" class="hero__scroll" aria-label="Défiler vers les travaux">
-        <span>Travaux</span>
-        <span class="hero__scroll-line" aria-hidden="true"></span>
-      </a>
+      <div class="hero__foot">
+        <p class="hero__role">Réalisateur, motion designer<br />&amp; designer visuel</p>
+        <a href="#travaux" class="hero__scroll">
+          <span>Voir les travaux</span>
+          <span class="hero__scroll-arrow" aria-hidden="true">↓</span>
+        </a>
+      </div>
     </section>
+
+    <!-- ====================== MARQUEE (une seule, identité) ====================== -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        <span>Vidéo — Motion — Graphisme — Photographie — Direction artistique — </span>
+        <span>Vidéo — Motion — Graphisme — Photographie — Direction artistique — </span>
+      </div>
+    </div>
 
     <!-- ====================== TRAVAUX ====================== -->
     <section class="works" id="travaux">
       <div class="works__head">
-        <h2 class="works__title">Travaux</h2>
-        <!-- Filtre discret et élégant -->
+        <h2 class="works__title" data-split>Travaux sélectionnés</h2>
         <div class="filter" role="tablist" aria-label="Filtrer les travaux">
           <button class="filter__btn is-active" data-filter="all" role="tab" aria-selected="true">Tout</button>
           <button class="filter__btn" data-filter="video" role="tab" aria-selected="false">Vidéo</button>
@@ -69,24 +76,23 @@
         </div>
       </div>
 
-      <!-- La grille est générée depuis js/projects.js — facile à éditer -->
-      <div class="grid" id="grid"></div>
+      <div class="grid" id="grid"><!-- généré depuis js/projects.js --></div>
     </section>
 
     <!-- ====================== À PROPOS ====================== -->
     <section class="about" id="apropos">
-      <p class="about__lead" data-reveal>
+      <p class="about__lead" data-split>
         Je développe depuis plusieurs années une pratique de l'image à travers la
         vidéo, le motion design, la photographie et le graphisme.
       </p>
       <div class="about__body">
-        <p data-reveal>
+        <p class="about__text" data-reveal>
           J'interviens aussi bien sur des projets artistiques que sur des commandes
           pour des entreprises, institutions, associations ou particuliers. Chaque
           projet est abordé avec la même attention portée à la narration, au rythme
           et à la fabrication des images.
         </p>
-        <ul class="about__services" data-reveal aria-label="Services">
+        <ol class="about__services" data-reveal aria-label="Services">
           <li>Films d'entreprise</li>
           <li>Contenus événementiels</li>
           <li>Clips musicaux</li>
@@ -94,19 +100,18 @@
           <li>Identités visuelles</li>
           <li>Animations</li>
           <li>Supports de communication</li>
-        </ul>
+        </ol>
       </div>
     </section>
   </main>
 
-  <!-- ====================== CONTACT (toujours visible, discret) ====================== -->
+  <!-- ====================== CONTACT (ligne discrète) ====================== -->
   <footer class="contact" id="contact">
-    <span class="contact__label">Contact</span>
+    <span class="contact__txt">Contact</span>
     <a class="contact__mail" href="mailto:hello@maeldan.com">hello@maeldan.com</a>
     <span class="contact__year"></span>
   </footer>
 
-  <!-- Smooth scroll + animations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.13/lenis.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
