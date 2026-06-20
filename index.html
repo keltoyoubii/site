@@ -32,10 +32,13 @@
     <!-- ====================== ACCUEIL / SHOWREEL ====================== -->
     <section class="hero" id="accueil">
       <div class="hero__media" data-parallax>
-        <video class="hero__video" autoplay muted loop playsinline preload="metadata"
-          poster="https://picsum.photos/seed/maeldan-showreel-cinematic/1920/1080">
-          <source src="videos/showreel.mp4" type="video/mp4" />
-        </video>
+        <div class="hero__video-wrap">
+          <!-- Showreel Vimeo en fond, mode "background" : autoplay, muet, boucle, sans overlay -->
+          <iframe
+            src="https://player.vimeo.com/video/839054878?background=1&autoplay=1&muted=1&loop=1&autopause=0&dnt=1"
+            allow="autoplay; fullscreen; picture-in-picture"
+            title="Showreel Maëldan" aria-hidden="true" tabindex="-1" loading="eager"></iframe>
+        </div>
         <div class="hero__scrim" aria-hidden="true"></div>
       </div>
 
