@@ -12,9 +12,9 @@
   --line-soft: rgba(12, 12, 12, 0.08);
   --on-dark:   #f4f3f0;
 
-  --font-sans:  "Inter", system-ui, -apple-system, sans-serif;
+  --font-sans:  "Geist", system-ui, -apple-system, "Helvetica Neue", sans-serif;
   --font-serif: "Newsreader", Georgia, "Times New Roman", serif;
-  --font-mono:  "JetBrains Mono", ui-monospace, monospace;
+  --font-mono:  "Geist Mono", ui-monospace, "JetBrains Mono", monospace;
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --maxw: 1560px;
@@ -45,9 +45,16 @@ a { color: inherit; text-decoration: none; }
 em, .serif { font-family: var(--font-serif); font-style: italic; font-weight: 400; }
 .mono { font-family: var(--font-mono); font-weight: 400; font-size: 0.72rem; letter-spacing: 0.02em; }
 
-/* effet flou au survol des grands titres */
-.blurable { transition: filter 0.55s var(--ease); }
-@media (hover: hover) { .blurable:hover { filter: blur(5px); } }
+/* Blur localisé qui suit le curseur (une petite zone) */
+.spot { position: relative; }
+.spot__blur {
+  position: absolute; inset: 0; pointer-events: none;
+  color: inherit; filter: blur(9px);
+  opacity: 0; transition: opacity 0.25s var(--ease);
+  -webkit-mask-image: radial-gradient(circle 68px at var(--sx, 50%) var(--sy, 50%), #000 0%, #000 32%, transparent 72%);
+          mask-image: radial-gradient(circle 68px at var(--sx, 50%) var(--sy, 50%), #000 0%, #000 32%, transparent 72%);
+}
+.spot.spot--on .spot__blur { opacity: 1; }
 
 /* ------------------------------ Grain animé ------------------------------ */
 .grain {
@@ -73,8 +80,13 @@ em, .serif { font-family: var(--font-serif); font-style: italic; font-weight: 40
   padding: clamp(1rem, 2.4vw, 1.6rem) var(--pad);
   mix-blend-mode: difference; color: #fff;
 }
-.nav__brand { font-weight: 600; font-size: 1.0625rem; letter-spacing: -0.01em; white-space: nowrap; }
-.nav__brand sup { font-size: 0.5em; font-weight: 500; top: -0.7em; }
+.nav__brand { display: flex; align-items: center; }
+.nav__logo {
+  display: block; width: clamp(74px, 8vw, 104px); aspect-ratio: 1357 / 684;
+  background: currentColor;
+  -webkit-mask: url("../assets/logo.svg") no-repeat center / contain;
+          mask: url("../assets/logo.svg") no-repeat center / contain;
+}
 .nav__links { display: flex; gap: clamp(1.1rem, 2.4vw, 2.4rem); font-size: 0.8125rem; font-weight: 400; }
 .nav__links a { position: relative; padding-bottom: 3px; }
 .nav__links a span { font-family: var(--font-mono); font-size: 0.62rem; opacity: 0.55; margin-right: 0.15rem; vertical-align: 1px; }
@@ -127,10 +139,8 @@ em, .serif { font-family: var(--font-serif); font-style: italic; font-weight: 40
 /* ------------------------------ Travaux ------------------------------ */
 .works { padding: clamp(4rem, 11vh, 7.5rem) var(--pad) clamp(3rem, 8vh, 5rem); max-width: var(--maxw); margin: 0 auto; }
 .works__head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem 2rem; margin-bottom: clamp(2.25rem, 5vh, 3.5rem); }
-.works__title { font-weight: 500; }
-.works__title .line { display: block; overflow: hidden; }
-.works__title .line__in { display: block; will-change: transform; font-size: clamp(1.75rem, 4vw, 3.25rem); line-height: 1; letter-spacing: -0.025em; }
-.works__title em { letter-spacing: 0; }
+.works__title { font-weight: 600; font-size: clamp(1.75rem, 4.2vw, 3.5rem); line-height: 1; letter-spacing: -0.03em; }
+.works__title em { letter-spacing: 0; font-weight: 400; }
 
 .filter { display: flex; flex-wrap: wrap; gap: clamp(0.75rem, 2vw, 1.6rem); padding-bottom: 0.5rem; }
 .filter__btn { background: none; border: none; cursor: pointer; font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); padding: 0.2rem 0; position: relative; transition: color 0.3s var(--ease); }

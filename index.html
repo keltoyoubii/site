@@ -11,7 +11,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Newsreader:ital,wght@1,300;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Newsreader:ital,wght@1,300;1,400;1,500&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/styles.css" />
 </head>
@@ -21,7 +21,7 @@
 
   <!-- ============================ NAV ============================ -->
   <header class="nav" id="nav">
-    <a href="#accueil" class="nav__brand">Maëldan<sup>®</sup></a>
+    <a href="#accueil" class="nav__brand" aria-label="Maëldan — accueil"><span class="nav__logo" aria-hidden="true"></span></a>
     <nav class="nav__links" aria-label="Navigation principale">
       <a href="#travaux"><span>01</span> Travaux</a>
       <a href="#apropos"><span>02</span> À propos</a>
@@ -65,9 +65,7 @@
     <!-- ====================== TRAVAUX ====================== -->
     <section class="works" id="travaux">
       <div class="works__head">
-        <h2 class="works__title blurable" data-line>
-          <span class="line"><span class="line__in">Travaux <em>sélectionnés</em></span></span>
-        </h2>
+        <h2 class="works__title spot" data-reveal>Travaux <em>sélectionnés</em></h2>
         <div class="filter" id="filter" role="tablist" aria-label="Filtrer les travaux"><!-- généré --></div>
       </div>
       <div class="grid" id="grid"><!-- généré depuis js/projects.js --></div>
@@ -82,7 +80,7 @@
 
         <p class="about__meta mono">(Maëldan Delpy — 29 ans)</p>
 
-        <p class="about__lead blurable" data-split>
+        <p class="about__lead" data-split>
           Je construis des univers à l'esthétique cinématographique, du portrait à la direction artistique de marque.
         </p>
 
@@ -127,6 +125,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="js/projects.js"></script>
+  <script src="js/spotblur.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

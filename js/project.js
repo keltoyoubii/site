@@ -27,7 +27,10 @@
   /* -------------------- Médias -------------------- */
   let media = "";
   (p.yt || []).forEach((id) => {
-    media += `<div class="proj__video"><div class="embed"><iframe src="https://www.youtube.com/embed/${id}?rel=0" title="${esc(p.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div></div>`;
+    media += `<figure class="proj__video ytfacade" data-id="${id}">
+      <img class="ytfacade__thumb" src="https://i.ytimg.com/vi/${id}/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${id}/hqdefault.jpg'" alt="${esc(p.title)}" loading="lazy" />
+      <button class="ytfacade__btn" type="button" aria-label="Lire la vidéo"><span class="ytfacade__play" aria-hidden="true"></span></button>
+    </figure>`;
   });
   for (let i = 1; i <= (p.images || 0); i++) {
     const n = String(i).padStart(2, "0");
@@ -39,7 +42,7 @@
   document.getElementById("project").innerHTML = `
     <article class="proj">
       <header class="proj__head">
-        <h1 class="proj__title blurable">${esc(p.title)}</h1>
+        <h1 class="proj__title spot">${esc(p.title)}</h1>
         <div class="proj__index mono">${num} / ${total}</div>
       </header>
       <div class="proj__info">
@@ -58,9 +61,19 @@
     <div class="proj__next">
       <a href="projet.html?id=${next.slug}">
         <span class="lbl mono">Projet suivant →</span>
-        <span class="ttl">${esc(next.title)}</span>
+        <span class="ttl spot">${esc(next.title)}</span>
       </a>
     </div>`;
+
+  /* -------------------- Façade YouTube (charge le lecteur au clic) -------------------- */
+  document.querySelectorAll(".ytfacade").forEach((f) => {
+    const btn = f.querySelector(".ytfacade__btn");
+    btn.addEventListener("click", () => {
+      const id = f.dataset.id;
+      f.innerHTML = `<div class="embed"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1&color=white&iv_load_policy=3" title="${esc(p.title)}" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen></iframe></div>`;
+      f.classList.add("is-playing");
+    });
+  });
 
   /* -------------------- Motion -------------------- */
   if (prefersReduced || !hasGSAP) {
