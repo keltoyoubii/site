@@ -4,20 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Maëldan — Réalisateur & Designer visuel</title>
-  <meta name="description" content="Maëldan — Réalisateur, motion designer et designer visuel. Films d'entreprise, clips, motion design, identités visuelles, photographie et projets artistiques." />
-
+  <meta name="description" content="Maëldan Delpy — Réalisateur, motion designer, photographe et directeur artistique. Films, clips, identités visuelles, photographie et projets artistiques." />
   <meta property="og:title" content="Maëldan — Réalisateur & Designer visuel" />
-  <meta property="og:description" content="Direction artistique, vidéo, motion design, photographie et graphisme." />
+  <meta property="og:description" content="Une pratique de l'image : vidéo, motion design, photographie et graphisme." />
   <meta property="og:type" content="website" />
 
-  <!-- Inter (sans, structurel) + Newsreader italique (serif, accents éditoriaux) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Newsreader:ital,wght@1,300;1,400;1,500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Newsreader:ital,wght@1,300;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
+  <!-- Grain animé -->
+  <div class="grain" aria-hidden="true"></div>
+
   <!-- ============================ NAV ============================ -->
   <header class="nav" id="nav">
     <a href="#accueil" class="nav__brand">Maëldan<sup>®</sup></a>
@@ -33,7 +34,6 @@
     <section class="hero" id="accueil">
       <div class="hero__media" data-parallax>
         <div class="hero__video-wrap">
-          <!-- Showreel Vimeo en fond, mode "background" : autoplay, muet, boucle, sans overlay -->
           <iframe
             src="https://player.vimeo.com/video/839054878?background=1&autoplay=1&muted=1&loop=1&autopause=0&dnt=1"
             allow="autoplay; fullscreen; picture-in-picture"
@@ -48,7 +48,7 @@
           <p class="hero__role"><em>Réalisateur, motion designer &amp; designer visuel</em></p>
         </div>
         <a href="#travaux" class="hero__scroll">
-          <span>Voir les travaux</span>
+          <span class="mono">Voir les travaux</span>
           <span class="hero__scroll-arrow" aria-hidden="true">↓</span>
         </a>
       </div>
@@ -65,65 +65,62 @@
     <!-- ====================== TRAVAUX ====================== -->
     <section class="works" id="travaux">
       <div class="works__head">
-        <h2 class="works__title" data-line>
+        <h2 class="works__title blurable" data-line>
           <span class="line"><span class="line__in">Travaux <em>sélectionnés</em></span></span>
         </h2>
-        <div class="filter" role="tablist" aria-label="Filtrer les travaux">
-          <button class="filter__btn is-active" data-filter="all" role="tab" aria-selected="true">Tout</button>
-          <button class="filter__btn" data-filter="video" role="tab" aria-selected="false">Vidéo</button>
-          <button class="filter__btn" data-filter="motion" role="tab" aria-selected="false">Motion</button>
-          <button class="filter__btn" data-filter="graphisme" role="tab" aria-selected="false">Graphisme</button>
-          <button class="filter__btn" data-filter="photographie" role="tab" aria-selected="false">Photographie</button>
-        </div>
+        <div class="filter" id="filter" role="tablist" aria-label="Filtrer les travaux"><!-- généré --></div>
       </div>
-
       <div class="grid" id="grid"><!-- généré depuis js/projects.js --></div>
     </section>
 
-    <!-- ====================== À PROPOS (texte qui gravite autour du portrait) ====================== -->
+    <!-- ====================== À PROPOS ====================== -->
     <section class="about" id="apropos">
       <div class="about__inner">
         <figure class="about__portrait">
-          <!-- TODO: remplacer par ta vraie photo (portrait, 3:4) -->
-          <img src="https://picsum.photos/seed/maeldan-portrait/900/1200" alt="Portrait de Maëldan" loading="lazy" />
+          <img src="assets/portrait/01.webp" alt="Portrait de Maëldan Delpy" loading="lazy" />
         </figure>
 
-        <p class="about__meta"><em>(Portrait)</em></p>
+        <p class="about__meta mono">(Maëldan Delpy — 29 ans)</p>
 
-        <p class="about__lead" data-split>
-          Je développe depuis plusieurs années une pratique de l'image à travers la vidéo, le motion design, la photographie et le graphisme.
+        <p class="about__lead blurable" data-split>
+          Je construis des univers à l'esthétique cinématographique, du portrait à la direction artistique de marque.
         </p>
 
         <div class="about__text" data-reveal>
           <p>
-            J'interviens aussi bien sur des projets artistiques que sur des commandes
-            pour des entreprises, institutions, associations ou particuliers. Chaque
-            projet est abordé avec la même attention portée à <em>la narration, au
-            rythme et à la fabrication des images</em>.
+            Je développe depuis plusieurs années une pratique de l'image qui mêle
+            réalisation vidéo, motion design, photographie et graphisme, sans jamais
+            séparer ces disciplines. J'interviens sur des projets artistiques comme
+            sur des commandes — entreprises, institutions, associations, particuliers —
+            avec <em>la même attention portée à la narration, au rythme et à la
+            fabrication des images</em>.
           </p>
         </div>
 
         <div class="about__services" data-reveal>
-          <p class="about__services-label"><em>Services</em></p>
-          <ol aria-label="Services">
-            <li>Films d'entreprise</li>
-            <li>Contenus événementiels</li>
+          <p class="about__services-label mono">Interventions</p>
+          <ul aria-label="Types de projets">
+            <li>Films d'entreprise &amp; institutionnels</li>
             <li>Clips musicaux</li>
-            <li>Projets culturels</li>
-            <li>Identités visuelles</li>
-            <li>Animations</li>
-            <li>Supports de communication</li>
-          </ol>
+            <li>Mariages &amp; événementiel</li>
+            <li>Motion design</li>
+            <li>Photographie</li>
+            <li>Direction artistique &amp; graphisme</li>
+          </ul>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- ====================== CONTACT (ligne discrète) ====================== -->
+  <!-- ====================== CONTACT ====================== -->
   <footer class="contact" id="contact">
-    <span class="contact__txt"><em>Contact</em></span>
-    <a class="contact__mail" href="mailto:hello@maeldan.com">hello@maeldan.com</a>
-    <span class="contact__year"></span>
+    <p class="contact__lead"><em>Un projet en tête&nbsp;?</em></p>
+    <a class="contact__mail" href="mailto:delpy.maeldan@gmail.com">delpy.maeldan@gmail.com</a>
+    <nav class="contact__social mono" aria-label="Réseaux">
+      <a href="https://instagram.com/maeldan___" target="_blank" rel="noopener">Instagram ↗</a>
+      <a href="https://www.linkedin.com/in/maeldan-delpy" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </nav>
+    <span class="contact__year mono"></span>
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.13/lenis.min.js"></script>
