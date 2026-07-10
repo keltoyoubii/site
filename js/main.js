@@ -10,7 +10,7 @@
 
   const CAT_LABELS = { video: "Vidéo", motion: "Motion", graphisme: "Graphisme", photographie: "Photographie" };
   const CAT_ORDER = ["video", "motion", "graphisme", "photographie"];
-  const cover = (p) => p.cover || `assets/projets/${p.slug}/01.webp`;
+  const cover = (p) => p.cover || (p.images > 0 ? `assets/projets/${p.slug}/01.webp` : null);
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   const yearEl = document.querySelector(".contact__year");
@@ -42,12 +42,16 @@
     a.href = `projet.html?id=${p.slug}`;
     a.dataset.category = p.cat;
     if (p.size) a.dataset.size = p.size;
-    const isVideo = p.cat === "video" && p.yt && p.yt.length;
-    if (isVideo) a.dataset.yt = p.yt[0];
+    const vimeoId = p.vimeo && p.vimeo[0];
+    const ytId = !vimeoId && p.yt && p.yt[0];
+    const isVideo = !!(vimeoId || ytId);
+    if (vimeoId) a.dataset.vimeo = vimeoId;
+    if (ytId) a.dataset.yt = ytId;
+    const cov = cover(p);
     const num = String(i + 1).padStart(2, "0");
     a.innerHTML = `
-      <div class="work__media${isVideo ? " is-video" : ""}">
-        <img class="work__img" src="${cover(p)}" alt="${esc(p.title)} — ${esc(p.type)}" loading="lazy" />
+      <div class="work__media${isVideo ? " is-video" : ""}${vimeoId ? " is-vimeo" : ""}">
+        ${cov ? `<img class="work__img" src="${cov}" alt="${esc(p.title)} — ${esc(p.type)}" loading="lazy" />` : `<span class="work__img work__img--none" aria-hidden="true"></span>`}
       </div>
       <div class="work__row">
         <div class="work__left">
@@ -65,22 +69,28 @@
   const works = Array.from(list.querySelectorAll(".work"));
 
   /* -------------------- Vidéos : lecture auto muette quand visible -------------------- */
-  const videoWorks = works.filter((w) => w.dataset.yt);
+  const videoWorks = works.filter((w) => w.dataset.vimeo || w.dataset.yt);
   if (videoWorks.length && !prefersReduced && "IntersectionObserver" in window) {
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         const media = e.target.querySelector(".work__media");
-        const id = e.target.dataset.yt;
         if (e.isIntersecting) {
           if (!media.querySelector("iframe")) {
+            const vimeo = e.target.dataset.vimeo, yt = e.target.dataset.yt;
             const f = document.createElement("iframe");
             f.className = "work__video";
-            f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`;
-            f.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+            if (vimeo) {
+              // Vimeo mode background : autoplay, muet, boucle, aucun overlay
+              f.src = `https://player.vimeo.com/video/${vimeo}?background=1&autoplay=1&muted=1&loop=1&autopause=0&dnt=1`;
+              f.setAttribute("allow", "autoplay; picture-in-picture");
+            } else {
+              // YouTube : le poster masque l'intro/branding puis s'efface
+              f.src = `https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&mute=1&loop=1&playlist=${yt}&controls=0&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`;
+              f.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+              f.addEventListener("load", () => setTimeout(() => media.classList.add("is-playing"), 1700));
+            }
             f.setAttribute("tabindex", "-1");
             f.setAttribute("aria-hidden", "true");
-            // le poster masque l'intro/branding YouTube, puis s'efface une fois la lecture lancée
-            f.addEventListener("load", () => setTimeout(() => media.classList.add("is-playing"), 1700));
             media.appendChild(f);
           }
         } else {

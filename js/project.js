@@ -26,6 +26,9 @@
 
   /* -------------------- Médias -------------------- */
   let media = "";
+  (p.vimeo || []).forEach((id) => {
+    media += `<figure class="proj__video"><div class="embed"><iframe src="https://player.vimeo.com/video/${id}?dnt=1&title=0&byline=0&portrait=0" title="${esc(p.title)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div></figure>`;
+  });
   (p.yt || []).forEach((id) => {
     media += `<figure class="proj__video ytfacade" data-id="${id}">
       <img class="ytfacade__thumb" src="https://i.ytimg.com/vi/${id}/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${id}/hqdefault.jpg'" alt="${esc(p.title)}" loading="lazy" />
