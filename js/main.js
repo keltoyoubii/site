@@ -42,8 +42,9 @@
     a.href = `projet.html?id=${p.slug}`;
     a.dataset.category = p.cat;
     if (p.size) a.dataset.size = p.size;
-    const vimeoId = p.vimeo && p.vimeo[0];
-    const ytId = !vimeoId && p.yt && p.yt[0];
+    const isVid = p.cat === "video" || p.cat === "motion";
+    const vimeoId = isVid && p.vimeo && p.vimeo[0];
+    const ytId = isVid && !vimeoId && p.yt && p.yt[0];
     const isVideo = !!(vimeoId || ytId);
     if (vimeoId) a.dataset.vimeo = vimeoId;
     if (ytId) a.dataset.yt = ytId;

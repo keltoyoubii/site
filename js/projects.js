@@ -38,10 +38,11 @@ window.PROJECTS = [
   { slug: "amaury", title: "Amaury × Amë Lorette", type: "Vidéo — Publicité", cat: "video", images: 0, vimeo: ["1208778430", "1208778431"],
     desc: "Campagne social pour la marque de lunettes Amaury Paris, en collaboration avec l'artiste Amë Lorette.", ambiance: "Mixed media, coloré, éditorial." },
 
-  { slug: "90-regards", title: "90 Regards", type: "Direction artistique — Série", cat: "graphisme", images: 6,
-    desc: "Série de recherche et de direction visuelle.", ambiance: "" },
+  { slug: "90-regards", title: "90 Regards", type: "Identité visuelle — Charte graphique", cat: "graphisme", images: 6,
+    desc: "Création d'identité visuelle pour une marque de vêtements workwear fait main, made in France.", ambiance: "" },
 
   { slug: "louka", title: "Louka — Avant l'orage", type: "Direction artistique — Éditorial mode", cat: "photographie", images: 5, year: "2025",
+    yt: ["eAnTYUSOsh0"], videoEnd: true,
     desc: "Portraits masculins « Avant l'orage » : denim, gouttes d'eau et ciels menaçants, étalonnage froid. Tirages et annotations manuscrites.", ambiance: "Cinématographique, orageuse, romantique." },
 
   { slug: "dopamoon", title: "Dopamoon — Dopalova", type: "Vidéo — Clip musical", cat: "video", images: 0, vimeo: ["1208775751"],

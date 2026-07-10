@@ -25,20 +25,22 @@
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   /* -------------------- Médias -------------------- */
-  let media = "";
+  let vids = "";
   (p.vimeo || []).forEach((id) => {
-    media += `<figure class="proj__video"><div class="embed"><iframe src="https://player.vimeo.com/video/${id}?dnt=1&title=0&byline=0&portrait=0" title="${esc(p.title)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div></figure>`;
+    vids += `<figure class="proj__video"><div class="embed"><iframe src="https://player.vimeo.com/video/${id}?dnt=1&title=0&byline=0&portrait=0" title="${esc(p.title)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div></figure>`;
   });
   (p.yt || []).forEach((id) => {
-    media += `<figure class="proj__video ytfacade" data-id="${id}">
+    vids += `<figure class="proj__video ytfacade" data-id="${id}">
       <img class="ytfacade__thumb" src="https://i.ytimg.com/vi/${id}/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${id}/hqdefault.jpg'" alt="${esc(p.title)}" loading="lazy" />
       <button class="ytfacade__btn" type="button" aria-label="Lire la vidéo"><span class="ytfacade__play" aria-hidden="true"></span></button>
     </figure>`;
   });
+  let imgs = "";
   for (let i = 1; i <= (p.images || 0); i++) {
     const n = String(i).padStart(2, "0");
-    media += `<figure class="proj__img"><img src="assets/projets/${p.slug}/${n}.webp" alt="${esc(p.title)} — ${i}" loading="lazy" /></figure>`;
+    imgs += `<figure class="proj__img"><img src="assets/projets/${p.slug}/${n}.webp" alt="${esc(p.title)} — ${i}" loading="lazy" /></figure>`;
   }
+  const media = p.videoEnd ? (imgs + vids) : (vids + imgs);
 
   /* -------------------- Rendu -------------------- */
   document.getElementById("project").innerHTML = `
