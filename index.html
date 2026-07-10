@@ -57,34 +57,39 @@
 
     <!-- ====================== À PROPOS ====================== -->
     <section class="about" id="apropos">
-      <div class="about__inner">
-        <figure class="about__portrait">
-          <img src="assets/portrait/01.webp" alt="Portrait de Maëldan Delpy" loading="lazy" />
-        </figure>
-        <p class="about__meta lbl">(Maëldan Delpy — 29 ans)</p>
-        <p class="about__lead" data-split>
-          Je construis des univers à l'esthétique cinématographique, du portrait à la direction artistique de marque.
-        </p>
-        <div class="about__text" data-reveal>
-          <p>
-            Je développe depuis plusieurs années une pratique de l'image qui mêle
-            réalisation vidéo, motion design, photographie et graphisme, sans jamais
-            séparer ces disciplines. J'interviens sur des projets artistiques comme
-            sur des commandes — entreprises, institutions, associations, particuliers —
-            avec la même attention portée à la narration, au rythme et à la fabrication
-            des images.
-          </p>
+      <div class="about__grid">
+        <div class="about__portrait" data-slideshow aria-label="Maëldan Delpy">
+          <img src="assets/portrait/01.webp" alt="Maëldan Delpy" class="is-active" />
+          <img src="assets/portrait/02.webp" alt="" aria-hidden="true" />
+          <img src="assets/portrait/03.webp" alt="" aria-hidden="true" />
         </div>
-        <div class="about__services" data-reveal>
-          <p class="about__services-label lbl">Interventions</p>
-          <ul aria-label="Types de projets">
-            <li>Films d'entreprise &amp; institutionnels</li>
-            <li>Clips musicaux</li>
-            <li>Mariages &amp; événementiel</li>
-            <li>Motion design</li>
-            <li>Photographie</li>
-            <li>Direction artistique &amp; graphisme</li>
-          </ul>
+
+        <div class="about__body">
+          <p class="about__eyebrow lbl">À propos — Maëldan Delpy, 29 ans</p>
+          <h2 class="about__lead" data-split>Créateur visuel pluridisciplinaire, du portrait à la direction artistique de marque.</h2>
+
+          <div class="about__text" data-reveal>
+            <p>
+              Je développe depuis plusieurs années une pratique de l'image qui mêle
+              réalisation vidéo, motion design, photographie et graphisme, sans jamais
+              séparer ces disciplines. J'interviens sur des projets artistiques comme
+              sur des commandes — entreprises, institutions, associations, particuliers —
+              avec la même attention portée à la narration, au rythme et à la fabrication
+              des images.
+            </p>
+          </div>
+
+          <div class="about__block" data-reveal>
+            <h3 class="about__h">Interventions</h3>
+            <ul class="about__services" aria-label="Types de projets">
+              <li>Films d'entreprise &amp; institutionnels</li>
+              <li>Clips musicaux</li>
+              <li>Mariages &amp; événementiel</li>
+              <li>Motion design</li>
+              <li>Photographie</li>
+              <li>Direction artistique &amp; graphisme</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>

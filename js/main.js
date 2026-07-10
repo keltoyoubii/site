@@ -49,12 +49,16 @@
       <div class="work__media${isVideo ? " is-video" : ""}">
         <img class="work__img" src="${cover(p)}" alt="${esc(p.title)} — ${esc(p.type)}" loading="lazy" />
       </div>
-      <div class="work__text">
-        <span class="work__num lbl">${num}</span>
-        <h3 class="work__title">${esc(p.title)}</h3>
-        <span class="work__type lbl">${esc(p.type)}</span>
-        <p class="work__desc">${esc(p.desc)}</p>
-        <span class="work__view lbl">Voir le projet →</span>
+      <div class="work__row">
+        <div class="work__left">
+          <span class="work__num lbl">${num}</span>
+          <h3 class="work__title">${esc(p.title)}</h3>
+        </div>
+        <div class="work__meta">
+          <span class="work__type lbl">${esc(p.type)}</span>
+          <p class="work__desc">${esc(p.desc)}</p>
+          <span class="work__view lbl">Voir le projet →</span>
+        </div>
       </div>`;
     list.appendChild(a);
   });
@@ -71,15 +75,17 @@
           if (!media.querySelector("iframe")) {
             const f = document.createElement("iframe");
             f.className = "work__video";
-            f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1`;
+            f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`;
             f.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
             f.setAttribute("tabindex", "-1");
             f.setAttribute("aria-hidden", "true");
+            // le poster masque l'intro/branding YouTube, puis s'efface une fois la lecture lancée
+            f.addEventListener("load", () => setTimeout(() => media.classList.add("is-playing"), 1700));
             media.appendChild(f);
           }
         } else {
           const f = media.querySelector("iframe");
-          if (f) f.remove();
+          if (f) { f.remove(); media.classList.remove("is-playing"); }
         }
       });
     }, { rootMargin: "10% 0px", threshold: 0.35 });
@@ -108,6 +114,20 @@
   }
   window.addEventListener("scroll", updateNav, { passive: true });
   updateNav();
+
+  /* -------------------- À propos : slideshow (3 photos, 3 s) -------------------- */
+  const slideshow = document.querySelector("[data-slideshow]");
+  if (slideshow && !prefersReduced) {
+    const imgs = Array.from(slideshow.querySelectorAll("img"));
+    if (imgs.length > 1) {
+      let si = 0;
+      setInterval(() => {
+        imgs[si].classList.remove("is-active");
+        si = (si + 1) % imgs.length;
+        imgs[si].classList.add("is-active");
+      }, 3000);
+    }
+  }
 
   /* -------------------- Morph du logo (centre géant -> nav) -------------------- */
   function setupLogoMorph() {

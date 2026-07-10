@@ -34,8 +34,7 @@
   });
   for (let i = 1; i <= (p.images || 0); i++) {
     const n = String(i).padStart(2, "0");
-    const wide = (i === 1 && !p.yt) || i % 4 === 0 ? " wide" : "";
-    media += `<figure class="proj__img${wide}"><img src="assets/projets/${p.slug}/${n}.webp" alt="${esc(p.title)} — ${i}" loading="lazy" /></figure>`;
+    media += `<figure class="proj__img"><img src="assets/projets/${p.slug}/${n}.webp" alt="${esc(p.title)} — ${i}" loading="lazy" /></figure>`;
   }
 
   /* -------------------- Rendu -------------------- */
