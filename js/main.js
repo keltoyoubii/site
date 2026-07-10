@@ -1,5 +1,5 @@
 /* =========================================================================
-   Maëldan — accueil : séquence de travaux, filtres, nav, animations scroll
+   Maëldan — accueil
    ========================================================================= */
 (function () {
   "use strict";
@@ -13,18 +13,16 @@
   const cover = (p) => p.cover || `assets/projets/${p.slug}/01.webp`;
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-  /* -------------------- Année -------------------- */
   const yearEl = document.querySelector(".contact__year");
   if (yearEl) yearEl.textContent = "© Maëldan Delpy " + new Date().getFullYear();
 
-  /* -------------------- Découpe en mots -------------------- */
   function splitWords(el) {
     const text = el.textContent.trim();
     el.innerHTML = text.split(/\s+/).map((w) => `<span class="word"><span class="word__in">${w}</span></span>`).join(" ");
     return Array.from(el.querySelectorAll(".word__in"));
   }
 
-  /* -------------------- Filtres dynamiques -------------------- */
+  /* -------------------- Filtres -------------------- */
   const present = CAT_ORDER.filter((c) => projects.some((p) => p.cat === c));
   const filterEl = document.getElementById("filter");
   const mkBtn = (f, label, active) => {
@@ -36,7 +34,7 @@
   filterEl.appendChild(mkBtn("all", "Tout", true));
   present.forEach((c) => filterEl.appendChild(mkBtn(c, CAT_LABELS[c], false)));
 
-  /* -------------------- Séquence de travaux -------------------- */
+  /* -------------------- Séquence -------------------- */
   const list = document.getElementById("works");
   projects.forEach((p, i) => {
     const a = document.createElement("a");
@@ -44,25 +42,51 @@
     a.href = `projet.html?id=${p.slug}`;
     a.dataset.category = p.cat;
     if (p.size) a.dataset.size = p.size;
+    const isVideo = p.cat === "video" && p.yt && p.yt.length;
+    if (isVideo) a.dataset.yt = p.yt[0];
     const num = String(i + 1).padStart(2, "0");
     a.innerHTML = `
-      <div class="work__media"><img class="work__img" src="${cover(p)}" alt="${esc(p.title)} — ${esc(p.type)}" loading="lazy" /></div>
-      <div class="work__row">
-        <div class="work__left">
-          <span class="work__num lbl">${num}</span>
-          <h3 class="work__title">${esc(p.title)}</h3>
-        </div>
-        <div class="work__meta">
-          <span class="work__type lbl">${esc(p.type)}</span>
-          <p class="work__desc">${esc(p.desc)}</p>
-          <span class="work__view lbl">Voir le projet →</span>
-        </div>
+      <div class="work__media${isVideo ? " is-video" : ""}">
+        <img class="work__img" src="${cover(p)}" alt="${esc(p.title)} — ${esc(p.type)}" loading="lazy" />
+      </div>
+      <div class="work__text">
+        <span class="work__num lbl">${num}</span>
+        <h3 class="work__title">${esc(p.title)}</h3>
+        <span class="work__type lbl">${esc(p.type)}</span>
+        <p class="work__desc">${esc(p.desc)}</p>
+        <span class="work__view lbl">Voir le projet →</span>
       </div>`;
     list.appendChild(a);
   });
   const works = Array.from(list.querySelectorAll(".work"));
 
-  /* -------------------- Filtre -------------------- */
+  /* -------------------- Vidéos : lecture auto muette quand visible -------------------- */
+  const videoWorks = works.filter((w) => w.dataset.yt);
+  if (videoWorks.length && !prefersReduced && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        const media = e.target.querySelector(".work__media");
+        const id = e.target.dataset.yt;
+        if (e.isIntersecting) {
+          if (!media.querySelector("iframe")) {
+            const f = document.createElement("iframe");
+            f.className = "work__video";
+            f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1`;
+            f.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
+            f.setAttribute("tabindex", "-1");
+            f.setAttribute("aria-hidden", "true");
+            media.appendChild(f);
+          }
+        } else {
+          const f = media.querySelector("iframe");
+          if (f) f.remove();
+        }
+      });
+    }, { rootMargin: "10% 0px", threshold: 0.35 });
+    videoWorks.forEach((w) => io.observe(w));
+  }
+
+  /* -------------------- Filtre comportement -------------------- */
   Array.from(filterEl.querySelectorAll(".filter__btn")).forEach((btn) => {
     btn.addEventListener("click", () => {
       const f = btn.dataset.filter;
@@ -75,7 +99,7 @@
     });
   });
 
-  /* -------------------- Nav : blanc sur showreel, noir sur fond clair -------------------- */
+  /* -------------------- Nav : blanc/noir -------------------- */
   const nav = document.getElementById("nav");
   const hero = document.querySelector(".hero");
   function updateNav() {
@@ -84,6 +108,31 @@
   }
   window.addEventListener("scroll", updateNav, { passive: true });
   updateNav();
+
+  /* -------------------- Morph du logo (centre géant -> nav) -------------------- */
+  function setupLogoMorph() {
+    const logo = document.querySelector(".nav__brand .logo-svg");
+    if (!logo || !hasGSAP || prefersReduced) return;
+    let tween;
+    function build() {
+      if (tween) { tween.scrollTrigger && tween.scrollTrigger.kill(); tween.kill(); }
+      gsap.set(logo, { clearProps: "transform" });
+      const base = logo.getBoundingClientRect();
+      const cx = base.left + base.width / 2, cy = base.top + base.height / 2;
+      const tx = window.innerWidth / 2 - cx;
+      const ty = window.innerHeight * 0.42 - cy;
+      const scale = Math.min(window.innerWidth * 0.58 / base.width, window.innerHeight * 0.42 / base.height);
+      tween = gsap.fromTo(logo,
+        { x: tx, y: ty, scale: scale },
+        { x: 0, y: 0, scale: 1, ease: "none", immediateRender: true,
+          scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+    }
+    build();
+    let rt;
+    window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(build, 200); });
+  }
+  if (document.querySelector(".nav__brand .logo-svg")) setupLogoMorph();
+  else window.addEventListener("logo:ready", setupLogoMorph, { once: true });
 
   /* -------------------- Sans motion -------------------- */
   if (prefersReduced || !hasGSAP) {
@@ -104,12 +153,12 @@
     });
   }
 
-  /* -------------------- Hero -------------------- */
-  gsap.set(".hero__title .line__in", { yPercent: 110 });
-  gsap.to(".hero__title .line__in", { yPercent: 0, duration: 1.2, ease: "expo.out", delay: 0.15 });
-  gsap.from(".hero__foot", { opacity: 0, y: 20, duration: 1, ease: "power2.out", delay: 0.8 });
+  /* -------------------- Hero baseline -------------------- */
+  gsap.from(".hero__baseline", { opacity: 0, y: 24, duration: 1.2, ease: "power2.out", delay: 0.5 });
+  gsap.to(".hero__baseline", { opacity: 0, y: -30, ease: "none",
+    scrollTrigger: { trigger: ".hero", start: "top top", end: "45% top", scrub: true } });
 
-  /* -------------------- Texte kinétique (à propos) -------------------- */
+  /* -------------------- À propos -------------------- */
   document.querySelectorAll("[data-split]").forEach((el) => {
     const words = splitWords(el);
     gsap.set(words, { yPercent: 110 });
@@ -122,9 +171,9 @@
 
   /* -------------------- Apparition des travaux + parallaxe -------------------- */
   works.forEach((w) => {
-    ScrollTrigger.create({ trigger: w, start: "top 82%", once: true, onEnter: () => w.classList.add("is-in") });
+    ScrollTrigger.create({ trigger: w, start: "top 80%", once: true, onEnter: () => w.classList.add("is-in") });
     const img = w.querySelector(".work__img");
-    if (img) gsap.fromTo(img, { yPercent: -5 }, { yPercent: 5, ease: "none",
+    if (img) gsap.fromTo(img, { yPercent: -4 }, { yPercent: 4, ease: "none",
       scrollTrigger: { trigger: w, start: "top bottom", end: "bottom top", scrub: true } });
   });
 })();
