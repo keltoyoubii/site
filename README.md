@@ -6,7 +6,9 @@ type kinétique, grain animé, flou au survol des grands titres.
 
 ## Stack
 HTML / CSS / JS natif, sans build. Lenis (scroll), GSAP (animations) via CDN.
-Typos : Inter · Newsreader (italique) · JetBrains Mono (méta).
+Typos (Typekit / Adobe Fonts, kit `fwk0sal`) : Helvetica Bold (titres) ·
+Argent Pixel (corps) · Beth Ellen (accent). Fallbacks Helvetica Neue / Arial.
+La section Travaux est une séquence verticale de projets (pas une grille).
 
 ## Structure
 ```

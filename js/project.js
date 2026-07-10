@@ -42,14 +42,14 @@
   document.getElementById("project").innerHTML = `
     <article class="proj">
       <header class="proj__head">
-        <h1 class="proj__title spot">${esc(p.title)}</h1>
-        <div class="proj__index mono">${num} / ${total}</div>
+        <h1 class="proj__title">${esc(p.title)}</h1>
+        <div class="proj__index lbl">${num} / ${total}</div>
       </header>
       <div class="proj__info">
         <div class="proj__meta">
-          <div class="proj__meta-row"><span class="k mono">Type</span><span class="v">${esc(p.type)}</span></div>
-          ${p.year ? `<div class="proj__meta-row"><span class="k mono">Année</span><span class="v">${esc(p.year)}</span></div>` : ""}
-          ${p.ambiance ? `<div class="proj__meta-row"><span class="k mono">Ambiance</span><span class="v"><em>${esc(p.ambiance)}</em></span></div>` : ""}
+          <div class="proj__meta-row"><span class="k lbl">Type</span><span class="v">${esc(p.type)}</span></div>
+          ${p.year ? `<div class="proj__meta-row"><span class="k lbl">Année</span><span class="v">${esc(p.year)}</span></div>` : ""}
+          ${p.ambiance ? `<div class="proj__meta-row"><span class="k lbl">Ambiance</span><span class="v"><em>${esc(p.ambiance)}</em></span></div>` : ""}
         </div>
         <div class="proj__desc">
           <p>${esc(p.desc)}</p>
@@ -60,8 +60,8 @@
     </article>
     <div class="proj__next">
       <a href="projet.html?id=${next.slug}">
-        <span class="lbl mono">Projet suivant →</span>
-        <span class="ttl spot">${esc(next.title)}</span>
+        <span class="lbl lbl">Projet suivant →</span>
+        <span class="ttl">${esc(next.title)}</span>
       </a>
     </div>`;
 

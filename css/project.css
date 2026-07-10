@@ -2,6 +2,8 @@
    Page projet
    ========================================================================= */
 .project-page { padding-top: 0; }
+/* pages projet : fond clair du haut -> nav en noir */
+.project-page .nav { color: var(--fg); }
 
 .proj { max-width: var(--maxw); margin: 0 auto; padding: clamp(6rem, 16vh, 10rem) var(--pad) 0; }
 

@@ -9,14 +9,11 @@
   <meta property="og:description" content="Une pratique de l'image : vidéo, motion design, photographie et graphisme." />
   <meta property="og:type" content="website" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Newsreader:ital,wght@1,300;1,400;1,500&display=swap" rel="stylesheet" />
-
+  <!-- Typekit : Helvetica (titres) · Argent Pixel (corps) · Beth Ellen (accent) -->
+  <link rel="stylesheet" href="https://use.typekit.net/fwk0sal.css" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <!-- Grain animé -->
   <div class="grain" aria-hidden="true"></div>
 
   <!-- ============================ NAV ============================ -->
@@ -45,30 +42,22 @@
       <div class="hero__foot">
         <div class="hero__id">
           <h1 class="hero__title"><span class="line"><span class="line__in">Maëldan</span></span></h1>
-          <p class="hero__role"><em>Réalisateur, motion designer &amp; designer visuel</em></p>
+          <p class="hero__role">Réalisateur, motion designer &amp; designer visuel</p>
         </div>
         <a href="#travaux" class="hero__scroll">
-          <span class="mono">Voir les travaux</span>
+          <span class="lbl">Voir les travaux</span>
           <span class="hero__scroll-arrow" aria-hidden="true">↓</span>
         </a>
       </div>
     </section>
 
-    <!-- ====================== MARQUEE ====================== -->
-    <div class="marquee" aria-hidden="true">
-      <div class="marquee__track">
-        <span>Vidéo <em>—</em> Motion <em>—</em> Graphisme <em>—</em> Photographie <em>—</em> Direction artistique <em>—</em>&nbsp;</span>
-        <span>Vidéo <em>—</em> Motion <em>—</em> Graphisme <em>—</em> Photographie <em>—</em> Direction artistique <em>—</em>&nbsp;</span>
-      </div>
-    </div>
-
-    <!-- ====================== TRAVAUX ====================== -->
+    <!-- ====================== TRAVAUX (séquence verticale) ====================== -->
     <section class="works" id="travaux">
       <div class="works__head">
-        <h2 class="works__title spot" data-reveal>Travaux <em>sélectionnés</em></h2>
+        <h2 class="works__title">Travaux <span class="hw">sélectionnés</span></h2>
         <div class="filter" id="filter" role="tablist" aria-label="Filtrer les travaux"><!-- généré --></div>
       </div>
-      <div class="grid" id="grid"><!-- généré depuis js/projects.js --></div>
+      <div class="works__list" id="works"><!-- généré depuis js/projects.js --></div>
     </section>
 
     <!-- ====================== À PROPOS ====================== -->
@@ -78,7 +67,7 @@
           <img src="assets/portrait/01.webp" alt="Portrait de Maëldan Delpy" loading="lazy" />
         </figure>
 
-        <p class="about__meta mono">(Maëldan Delpy — 29 ans)</p>
+        <p class="about__meta lbl">(Maëldan Delpy — 29 ans)</p>
 
         <p class="about__lead" data-split>
           Je construis des univers à l'esthétique cinématographique, du portrait à la direction artistique de marque.
@@ -90,13 +79,13 @@
             réalisation vidéo, motion design, photographie et graphisme, sans jamais
             séparer ces disciplines. J'interviens sur des projets artistiques comme
             sur des commandes — entreprises, institutions, associations, particuliers —
-            avec <em>la même attention portée à la narration, au rythme et à la
-            fabrication des images</em>.
+            avec la même attention portée à la narration, au rythme et à la fabrication
+            des images.
           </p>
         </div>
 
         <div class="about__services" data-reveal>
-          <p class="about__services-label mono">Interventions</p>
+          <p class="about__services-label lbl">Interventions</p>
           <ul aria-label="Types de projets">
             <li>Films d'entreprise &amp; institutionnels</li>
             <li>Clips musicaux</li>
@@ -112,20 +101,19 @@
 
   <!-- ====================== CONTACT ====================== -->
   <footer class="contact" id="contact">
-    <p class="contact__lead"><em>Un projet en tête&nbsp;?</em></p>
+    <p class="contact__lead"><span class="hw">Un projet en tête&nbsp;?</span></p>
     <a class="contact__mail" href="mailto:delpy.maeldan@gmail.com">delpy.maeldan@gmail.com</a>
-    <nav class="contact__social mono" aria-label="Réseaux">
+    <nav class="contact__social lbl" aria-label="Réseaux">
       <a href="https://instagram.com/maeldan___" target="_blank" rel="noopener">Instagram ↗</a>
       <a href="https://www.linkedin.com/in/maeldan-delpy" target="_blank" rel="noopener">LinkedIn ↗</a>
     </nav>
-    <span class="contact__year mono"></span>
+    <span class="contact__year lbl"></span>
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.13/lenis.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="js/projects.js"></script>
-  <script src="js/spotblur.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
