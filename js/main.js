@@ -200,11 +200,8 @@
     ScrollTrigger.create({ trigger: el, start: "top 88%", once: true, onEnter: () => el.classList.add("is-revealed") });
   });
 
-  /* -------------------- Apparition des travaux + parallaxe -------------------- */
+  /* -------------------- Apparition des travaux -------------------- */
   works.forEach((w) => {
     ScrollTrigger.create({ trigger: w, start: "top 80%", once: true, onEnter: () => w.classList.add("is-in") });
-    const img = w.querySelector(".work__img");
-    if (img) gsap.fromTo(img, { yPercent: -4 }, { yPercent: 4, ease: "none",
-      scrollTrigger: { trigger: w, start: "top bottom", end: "bottom top", scrub: true } });
   });
 })();
