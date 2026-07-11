@@ -89,8 +89,9 @@
         `<div class="work__cell work__vid is-vimeo" data-vimeo="${id}"><span class="work__ph"></span></div>`).join("");
       mediaHtml = `<div class="work__media work__media--duo is-video">${cells}</div>`;
     } else if (p.duo && p.images >= 2) {
-      // deux images verticales côte à côte
-      const cells = [1, 2].map((n) =>
+      // deux images verticales côte à côte (paire personnalisable)
+      const pair = p.duoPair || [1, 2];
+      const cells = pair.map((n) =>
         `<div class="work__cell">${imgTag(`assets/projets/${p.slug}/${String(n).padStart(2,"0")}.webp`)}</div>`).join("");
       mediaHtml = `<div class="work__media work__media--duo">${cells}</div>`;
     } else if (isVideo) {
@@ -236,20 +237,29 @@
     scrollTrigger: { trigger: ".hero", start: "top top", end: "45% top", scrub: true } });
 
   /* -------------------- À propos -------------------- */
-  // À propos — titre : lignes qui entrent par la droite
-  document.querySelectorAll("[data-lines]").forEach((el) => {
-    const lines = splitLines(el);
-    gsap.set(lines, { x: 60, opacity: 0 });
-    ScrollTrigger.create({ trigger: el, start: "top 82%", once: true,
-      onEnter: () => gsap.to(lines, { x: 0, opacity: 1, duration: 1, ease: "expo.out", stagger: 0.12 }) });
-  });
-  // À propos — corps : machine à écrire
-  document.querySelectorAll("[data-typewriter]").forEach((el) => {
-    const full = el.textContent.trim();
-    el.style.minHeight = el.offsetHeight + "px";
-    el.textContent = "";
-    ScrollTrigger.create({ trigger: el, start: "top 80%", once: true, onEnter: () => typewriter(el, full) });
-  });
+  // À propos — préparé après le chargement (déclenché au scroll, pas au load)
+  function setupAbout() {
+    document.querySelectorAll("[data-lines]").forEach((el) => {
+      const lines = splitLines(el);
+      gsap.set(lines, { x: 80, opacity: 0 });
+      ScrollTrigger.create({ trigger: el, start: "top 78%", once: true,
+        onEnter: () => gsap.to(lines, { x: 0, opacity: 1, duration: 1.5, ease: "expo.out", stagger: 0.3 }) });
+    });
+    document.querySelectorAll("[data-typewriter]").forEach((el) => {
+      const full = el.textContent.trim();
+      el.style.minHeight = el.offsetHeight + "px";
+      el.textContent = "";
+      ScrollTrigger.create({ trigger: el, start: "top 76%", once: true, onEnter: () => typewriter(el, full) });
+    });
+    ScrollTrigger.refresh();
+  }
+  if (document.readyState === "complete") setupAbout();
+  else window.addEventListener("load", setupAbout, { once: true });
+
+  // recalcule les positions au fur et à mesure du chargement des images (page très longue)
+  let refreshT;
+  const refresh = () => { clearTimeout(refreshT); refreshT = setTimeout(() => ScrollTrigger.refresh(), 200); };
+  list.querySelectorAll("img").forEach((img) => { if (!img.complete) img.addEventListener("load", refresh, { once: true }); });
   document.querySelectorAll("[data-reveal]").forEach((el) => {
     ScrollTrigger.create({ trigger: el, start: "top 88%", once: true, onEnter: () => el.classList.add("is-revealed") });
   });

@@ -35,11 +35,21 @@
       <button class="ytfacade__btn" type="button" aria-label="Lire la vidéo"><span class="ytfacade__play" aria-hidden="true"></span></button>
     </figure>`;
   });
+  // Groupe les verticaux/carrés par 2 ; les horizontaux occupent toute la largeur
+  const shapes = p.shapes || "";
+  const figure = (n) => `<figure class="proj__img"><img src="assets/projets/${p.slug}/${String(n).padStart(2,"0")}.webp" alt="${esc(p.title)} — ${n}" loading="lazy" /></figure>`;
   let imgs = "";
+  let pend = [];
+  const flush = () => {
+    if (pend.length === 2) imgs += `<div class="proj__duo">${figure(pend[0])}${figure(pend[1])}</div>`;
+    else if (pend.length === 1) imgs += `<div class="proj__duo proj__duo--one">${figure(pend[0])}</div>`;
+    pend = [];
+  };
   for (let i = 1; i <= (p.images || 0); i++) {
-    const n = String(i).padStart(2, "0");
-    imgs += `<figure class="proj__img"><img src="assets/projets/${p.slug}/${n}.webp" alt="${esc(p.title)} — ${i}" loading="lazy" /></figure>`;
+    if ((shapes[i - 1] || "v") === "h") { flush(); imgs += figure(i); }
+    else { pend.push(i); if (pend.length === 2) flush(); }
   }
+  flush();
   const media = p.videoEnd ? (imgs + vids) : (vids + imgs);
 
   /* -------------------- Rendu -------------------- */

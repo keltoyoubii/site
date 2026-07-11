@@ -44,9 +44,15 @@
 .ytfacade__btn:hover .ytfacade__play { transform: scale(1.06); background: #f4f3f0; }
 .ytfacade__play::before { content: ""; width: 0; height: 0; margin-left: 4px; border-style: solid; border-width: 11px 0 11px 18px; border-color: transparent transparent transparent #0c0c0c; }
 
-.proj__img { width: 100%; max-width: 1120px; background: #e7e6e2; overflow: hidden; }
+.proj__img { width: 100%; max-width: 1120px; background: var(--bg); overflow: hidden; }
 .proj__img img { width: 100%; height: auto; display: block; }
 .ytfacade { width: 100%; max-width: 1120px; }
+
+/* Duo : verticaux/carrés côte à côte */
+.proj__duo { width: 100%; max-width: 1120px; display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 2vw, 1.75rem); align-items: start; }
+.proj__duo .proj__img { max-width: none; }
+.proj__duo--one .proj__img { grid-column: 1; }
+@media (max-width: 640px) { .proj__duo { grid-template-columns: 1fr; } }
 
 /* reveal */
 .proj__video, .proj__img { opacity: 0; transform: translateY(26px); }
