@@ -24,19 +24,19 @@ window.PROJECTS = [
   { slug: "aescend", title: "Æscend", type: "Identité visuelle — Charte graphique", cat: "graphisme", images: 11,
     desc: "Identité d'une marque de compléments alimentaires et nutrition sportive. Logo dynamique, typographie impactante, palette orange / noir. Signature : « Chaque jour plus haut ».", ambiance: "Énergique, sportif, premium." },
 
-  { slug: "djullz", title: "Djullz", type: "Photographie — Portrait éditorial", cat: "photographie", images: 14,
+  { slug: "djullz", duo: true, title: "Djullz", type: "Photographie — Portrait éditorial", cat: "photographie", images: 14,
     desc: "Portraits en extérieur pour l'influenceuse @djullz.", ambiance: "Fashion, lifestyle, extérieur." },
 
-  { slug: "90-regards", title: "90 Regards", type: "Identité visuelle — Charte graphique", cat: "graphisme", images: 6,
+  { slug: "90-regards", duo: true, title: "90 Regards", type: "Identité visuelle — Charte graphique", cat: "graphisme", images: 6,
     desc: "Création d'identité visuelle pour une marque de vêtements workwear fait main, made in France.", ambiance: "" },
 
   { slug: "mariage-chloe-nico", title: "Chloé & Nicolas", type: "Vidéo — Aftermovie mariage", cat: "video", images: 0, vimeo: ["1208774915"],
     desc: "Aftermovie de mariage, écriture cinématographique. « Cinematic wedding video for lovers. »", ambiance: "Romantique, vintage, onirique." },
 
-  { slug: "annihilation", title: "Annihilation", type: "Photographie — Portrait", cat: "photographie", images: 2,
+  { slug: "annihilation", duo: true, title: "Annihilation", type: "Photographie — Portrait", cat: "photographie", images: 2,
     desc: "Portrait autour d'une direction artistique surréaliste inspirée du film Annihilation.", ambiance: "Glaciale, éthérée, minimaliste." },
 
-  { slug: "igor", title: "Igor", type: "Direction artistique — Covers musicales", cat: "graphisme", images: 12,
+  { slug: "igor", duo: true, title: "Igor", type: "Direction artistique — Covers musicales", cat: "graphisme", images: 12,
     desc: "Pochettes pour l'univers éclectique d'Igor. Ciels de nuit, pluie numérique et silhouettes travaillées.", ambiance: "Nocturne, urbaine, cinématographique." },
 
   { slug: "anti", title: "Anti × Keutchi", type: "Vidéo — Publicité", cat: "video", images: 7, vimeo: ["1208774916"],
@@ -48,14 +48,14 @@ window.PROJECTS = [
   { slug: "cap-metiers", title: "Cap Métiers", type: "Motion design", cat: "motion", images: 0, vimeo: ["1208776567"],
     desc: "Mix de séquences motion design réalisées pour Cap Métiers Nouvelle-Aquitaine.", ambiance: "Corporate, animé, institutionnel." },
 
-  { slug: "web", title: "Web", type: "Photographie — Éditorial nocturne", cat: "photographie", images: 5,
+  { slug: "web", duo: true, title: "Web", type: "Photographie — Éditorial nocturne", cat: "photographie", images: 5,
     desc: "Série de groupe en nocturne, flash direct et voiture. Esthétique « crew » très années 2000.", ambiance: "Nocturne, urbaine, collective." },
 
   { slug: "dopamoon", title: "Dopamoon — Dopalova", type: "Vidéo — Clip musical", cat: "video", images: 0, vimeo: ["1208775751"],
     yt: ["x8LqjBa711A","_MK2Iso0LaQ","JHd2XkOoGAo","-uYufwjSEfI"],
     desc: "Réalisation de clips pour le groupe Dopamoon, issus de leur album DOPALOVA produit par ALTER K.", ambiance: "Funky, vintage, lifestyle." },
 
-  { slug: "lilou", title: "Lilou", type: "Photographie — Portrait N&B", cat: "photographie", images: 4,
+  { slug: "lilou", duo: true, title: "Lilou", type: "Photographie — Portrait N&B", cat: "photographie", images: 4,
     desc: "Portraits argentiques noir & blanc au grain marqué, atmosphère intime, plus une variation en duotone vert.", ambiance: "Intime, argentique, brute." },
 
   { slug: "milinkostaud", title: "Milinkostaud", type: "Identité visuelle — Charte graphique", cat: "graphisme", images: 7,
@@ -68,7 +68,7 @@ window.PROJECTS = [
   { slug: "luxie", title: "Luxie", type: "Photographie — Cover", cat: "photographie", images: 4,
     desc: "Série intimiste pour l'artiste Luxie.", ambiance: "Intime, rêveuse, musicale." },
 
-  { slug: "amaury", title: "Amaury × Amë Lorette", type: "Vidéo — Publicité", cat: "video", images: 0, vimeo: ["1208778430", "1208778431"],
+  { slug: "amaury", duo: true, title: "Amaury × Amë Lorette", type: "Vidéo — Publicité", cat: "video", images: 0, vimeo: ["1208778430", "1208778431"],
     desc: "Campagne social pour la marque de lunettes Amaury Paris, en collaboration avec l'artiste Amë Lorette.", ambiance: "Mixed media, coloré, éditorial." },
 
   { slug: "nowhere-drive", title: "Nowhere Drive", type: "Photographie — Série narrative", cat: "photographie", images: 10,

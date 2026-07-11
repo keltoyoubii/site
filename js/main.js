@@ -22,6 +22,39 @@
     return Array.from(el.querySelectorAll(".word__in"));
   }
 
+  // découpe un texte en LIGNES réelles (selon le retour à la ligne rendu)
+  function splitLines(el) {
+    const text = el.textContent.trim();
+    el.innerHTML = text.split(/\s+/).map((w) => `<span class="w">${w}</span>`).join(" ");
+    const ws = Array.from(el.querySelectorAll(".w"));
+    const lines = []; let cur = []; let top = null;
+    ws.forEach((w) => { const t = w.offsetTop; if (top === null) top = t; if (Math.abs(t - top) > 3) { lines.push(cur); cur = []; top = t; } cur.push(w); });
+    if (cur.length) lines.push(cur);
+    el.innerHTML = "";
+    const inners = [];
+    lines.forEach((grp) => {
+      const wrap = document.createElement("span"); wrap.className = "linewrap";
+      const inner = document.createElement("span"); inner.className = "linewrap__in";
+      inner.textContent = grp.map((w) => w.textContent).join(" ");
+      wrap.appendChild(inner); el.appendChild(wrap); inners.push(inner);
+    });
+    return inners;
+  }
+
+  // machine à écrire avec curseur clignotant
+  function typewriter(el, full) {
+    el.textContent = "";
+    const caret = document.createElement("span"); caret.className = "type-caret";
+    el.appendChild(caret);
+    let i = 0;
+    (function step() {
+      if (i >= full.length) return;
+      caret.insertAdjacentText("beforebegin", full[i]);
+      const ch = full[i]; i++;
+      setTimeout(step, ch === " " ? 16 : (".,;—".includes(ch) ? 90 : 11));
+    })();
+  }
+
   /* -------------------- Filtres -------------------- */
   const present = CAT_ORDER.filter((c) => projects.some((p) => p.cat === c));
   const filterEl = document.getElementById("filter");
@@ -41,19 +74,34 @@
     a.className = "work";
     a.href = `projet.html?id=${p.slug}`;
     a.dataset.category = p.cat;
-    if (p.size) a.dataset.size = p.size;
     const isVid = p.cat === "video" || p.cat === "motion";
     const vimeoId = isVid && p.vimeo && p.vimeo[0];
     const ytId = isVid && !vimeoId && p.yt && p.yt[0];
     const isVideo = !!(vimeoId || ytId);
-    if (vimeoId) a.dataset.vimeo = vimeoId;
-    if (ytId) a.dataset.yt = ytId;
     const cov = cover(p);
     const num = String(i + 1).padStart(2, "0");
-    a.innerHTML = `
-      <div class="work__media${isVideo ? " is-video" : ""}${vimeoId ? " is-vimeo" : ""}">
-        ${cov ? `<img class="work__img" src="${cov}" alt="${esc(p.title)} — ${esc(p.type)}" loading="lazy" />` : `<span class="work__img work__img--none" aria-hidden="true"></span>`}
-      </div>
+    const imgTag = (src) => `<img class="work__img" src="${src}" alt="${esc(p.title)} — ${esc(p.type)}" loading="lazy" />`;
+
+    let mediaHtml;
+    if (p.duo && isVideo && p.vimeo && p.vimeo.length >= 2) {
+      // deux vidéos verticales côte à côte
+      const cells = p.vimeo.slice(0, 2).map((id) =>
+        `<div class="work__cell work__vid is-vimeo" data-vimeo="${id}"><span class="work__ph"></span></div>`).join("");
+      mediaHtml = `<div class="work__media work__media--duo is-video">${cells}</div>`;
+    } else if (p.duo && p.images >= 2) {
+      // deux images verticales côte à côte
+      const cells = [1, 2].map((n) =>
+        `<div class="work__cell">${imgTag(`assets/projets/${p.slug}/${String(n).padStart(2,"0")}.webp`)}</div>`).join("");
+      mediaHtml = `<div class="work__media work__media--duo">${cells}</div>`;
+    } else if (isVideo) {
+      const attr = vimeoId ? `data-vimeo="${vimeoId}"` : `data-yt="${ytId}"`;
+      const inner = cov ? imgTag(cov) : `<span class="work__ph"></span>`;
+      mediaHtml = `<div class="work__media work__vid is-video${vimeoId ? " is-vimeo" : ""}" ${attr}>${inner}</div>`;
+    } else {
+      mediaHtml = `<div class="work__media">${cov ? imgTag(cov) : `<span class="work__ph"></span>`}</div>`;
+    }
+
+    a.innerHTML = `${mediaHtml}
       <div class="work__row">
         <div class="work__left">
           <span class="work__num lbl">${num}</span>
@@ -70,37 +118,35 @@
   const works = Array.from(list.querySelectorAll(".work"));
 
   /* -------------------- Vidéos : lecture auto muette quand visible -------------------- */
-  const videoWorks = works.filter((w) => w.dataset.vimeo || w.dataset.yt);
-  if (videoWorks.length && !prefersReduced && "IntersectionObserver" in window) {
+  const vidHosts = Array.from(list.querySelectorAll(".work__vid"));
+  if (vidHosts.length && !prefersReduced && "IntersectionObserver" in window) {
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
-        const media = e.target.querySelector(".work__media");
+        const host = e.target;
         if (e.isIntersecting) {
-          if (!media.querySelector("iframe")) {
-            const vimeo = e.target.dataset.vimeo, yt = e.target.dataset.yt;
+          if (!host.querySelector("iframe")) {
+            const vimeo = host.dataset.vimeo, yt = host.dataset.yt;
             const f = document.createElement("iframe");
             f.className = "work__video";
             if (vimeo) {
-              // Vimeo mode background : autoplay, muet, boucle, aucun overlay
               f.src = `https://player.vimeo.com/video/${vimeo}?background=1&autoplay=1&muted=1&loop=1&autopause=0&dnt=1`;
               f.setAttribute("allow", "autoplay; picture-in-picture");
             } else {
-              // YouTube : le poster masque l'intro/branding puis s'efface
               f.src = `https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&mute=1&loop=1&playlist=${yt}&controls=0&modestbranding=1&playsinline=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`;
               f.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
-              f.addEventListener("load", () => setTimeout(() => media.classList.add("is-playing"), 1700));
+              f.addEventListener("load", () => setTimeout(() => host.classList.add("is-playing"), 1700));
             }
             f.setAttribute("tabindex", "-1");
             f.setAttribute("aria-hidden", "true");
-            media.appendChild(f);
+            host.appendChild(f);
           }
         } else {
-          const f = media.querySelector("iframe");
-          if (f) { f.remove(); media.classList.remove("is-playing"); }
+          const f = host.querySelector("iframe");
+          if (f) { f.remove(); host.classList.remove("is-playing"); }
         }
       });
-    }, { rootMargin: "10% 0px", threshold: 0.35 });
-    videoWorks.forEach((w) => io.observe(w));
+    }, { rootMargin: "10% 0px", threshold: 0.25 });
+    vidHosts.forEach((h) => io.observe(h));
   }
 
   /* -------------------- Filtre comportement -------------------- */
@@ -190,11 +236,19 @@
     scrollTrigger: { trigger: ".hero", start: "top top", end: "45% top", scrub: true } });
 
   /* -------------------- À propos -------------------- */
-  document.querySelectorAll("[data-split]").forEach((el) => {
-    const words = splitWords(el);
-    gsap.set(words, { yPercent: 110 });
-    ScrollTrigger.create({ trigger: el, start: "top 85%", once: true,
-      onEnter: () => gsap.to(words, { yPercent: 0, duration: 0.9, ease: "expo.out", stagger: 0.03 }) });
+  // À propos — titre : lignes qui entrent par la droite
+  document.querySelectorAll("[data-lines]").forEach((el) => {
+    const lines = splitLines(el);
+    gsap.set(lines, { x: 60, opacity: 0 });
+    ScrollTrigger.create({ trigger: el, start: "top 82%", once: true,
+      onEnter: () => gsap.to(lines, { x: 0, opacity: 1, duration: 1, ease: "expo.out", stagger: 0.12 }) });
+  });
+  // À propos — corps : machine à écrire
+  document.querySelectorAll("[data-typewriter]").forEach((el) => {
+    const full = el.textContent.trim();
+    el.style.minHeight = el.offsetHeight + "px";
+    el.textContent = "";
+    ScrollTrigger.create({ trigger: el, start: "top 80%", once: true, onEnter: () => typewriter(el, full) });
   });
   document.querySelectorAll("[data-reveal]").forEach((el) => {
     ScrollTrigger.create({ trigger: el, start: "top 88%", once: true, onEnter: () => el.classList.add("is-revealed") });
