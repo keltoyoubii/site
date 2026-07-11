@@ -24,7 +24,7 @@ window.PROJECTS = [
   { slug: "aescend", title: "Æscend", type: "Identité visuelle — Charte graphique", cat: "graphisme", images: 11, shapes: "hhhhhhhhhhh",
     desc: "Identité d'une marque de compléments alimentaires et nutrition sportive. Logo dynamique, typographie impactante, palette orange / noir. Signature : « Chaque jour plus haut ».", ambiance: "Énergique, sportif, premium." },
 
-  { slug: "djullz", duo: true, duoPair: [1, 10], title: "Djullz", type: "Photographie — Portrait éditorial", cat: "photographie", images: 14, shapes: "vvvvvvvvvvvvvv",
+  { slug: "djullz", duo: true, title: "Djullz", type: "Photographie — Portrait éditorial", cat: "photographie", images: 14, shapes: "vvvvvvvvvvvvvv",
     desc: "Portraits en extérieur pour l'influenceuse @djullz.", ambiance: "Fashion, lifestyle, extérieur." },
 
   { slug: "90-regards", duo: true, title: "90 Regards", type: "Identité visuelle — Charte graphique", cat: "graphisme", images: 6, shapes: "vvvvvv",

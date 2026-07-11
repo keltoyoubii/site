@@ -46,7 +46,7 @@
     pend = [];
   };
   for (let i = 1; i <= (p.images || 0); i++) {
-    if ((shapes[i - 1] || "v") === "h") { flush(); imgs += figure(i); }
+    if ((shapes[i - 1] || "v") === "h") { imgs += figure(i); }  // horizontale : pleine largeur (n'interrompt pas l'appairage)
     else { pend.push(i); if (pend.length === 2) flush(); }
   }
   flush();
