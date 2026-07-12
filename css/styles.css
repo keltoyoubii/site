@@ -138,7 +138,10 @@ em { font-style: italic; }
 }
 
 /* ------------------------------ À propos ------------------------------ */
-.about { padding: clamp(5rem, 14vh, 10rem) var(--pad) clamp(5rem, 13vh, 9rem); }
+.about { padding: clamp(4rem, 10vh, 7rem) var(--pad) clamp(5rem, 13vh, 9rem); }
+.about__head { max-width: var(--maxw); margin: 0 auto clamp(3rem, 8vh, 6rem); border-top: 1px solid var(--line); padding-top: clamp(2rem, 5vh, 3.5rem); }
+.about__kicker { display: block; color: var(--fg-muted); margin-bottom: clamp(0.75rem, 2vh, 1.5rem); }
+.about__big { font-family: var(--font-hand); font-weight: 400; font-size: clamp(3.25rem, 12vw, 9.5rem); line-height: 1.02; letter-spacing: 0; }
 .about__grid { max-width: var(--maxw); margin: 0 auto; display: grid; grid-template-columns: minmax(260px, 38%) 1fr; gap: clamp(2.5rem, 6vw, 6rem); align-items: start; }
 
 .about__portrait { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: #e7e6e2; }
