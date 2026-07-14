@@ -109,7 +109,8 @@
     </article>
     <div class="proj__next">
       <a href="projet.html?id=${next.slug}">
-        <span class="lbl lbl">Projet suivant →</span>
+        ${(next.cover || next.images > 0) ? `<img class="proj__next-img" src="${next.cover || `assets/projets/${next.slug}/01.webp`}" alt="" aria-hidden="true" loading="lazy" />` : ""}
+        <span class="lbl">Projet suivant →</span>
         <span class="ttl">${esc(next.title)}</span>
       </a>
     </div>`;

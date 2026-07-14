@@ -44,6 +44,48 @@ em { font-style: italic; }
   overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
 
+/* --------------------- Transitions de page --------------------- */
+html.js body { opacity: 0; }
+html.js.is-ready body { opacity: 1; transition: opacity 0.55s ease; }
+html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
+
+/* --------------------- Barre de progression --------------------- */
+.progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 120;
+  background: #fff; mix-blend-mode: difference;
+  transform: scaleX(0); transform-origin: left; pointer-events: none;
+}
+
+/* --------------------- Curseur contextuel --------------------- */
+.cursor {
+  position: fixed; left: 0; top: 0; z-index: 150; pointer-events: none;
+  width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%;
+  background: #fff; mix-blend-mode: difference; opacity: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.3s ease, width 0.38s var(--ease), height 0.38s var(--ease),
+              margin 0.38s var(--ease), background 0.3s ease;
+}
+.cursor.is-on { opacity: 1; }
+.cursor.is-down { transition-duration: 0.15s; }
+.cursor.is-down:not(.is-label) { width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; }
+.cursor__lbl {
+  font-family: var(--font-title); font-weight: 500; font-size: 0.62rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg);
+  opacity: 0; transition: opacity 0.25s ease 0.08s; white-space: nowrap;
+}
+.cursor.is-label {
+  width: 86px; height: 86px; margin: -43px 0 0 -43px;
+  mix-blend-mode: normal; background: rgba(244, 243, 240, 0.88);
+  backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+}
+.cursor.is-label .cursor__lbl { opacity: 1; }
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  [data-cursor], [data-cursor] * { cursor: none; }
+}
+
+/* --------------------- Liens magnétiques --------------------- */
+.magnetic { display: inline-block; will-change: transform; transition: transform 0.3s var(--ease); }
+
 /* ------------------------------ Grain ------------------------------ */
 .grain {
   position: fixed; inset: -50%; z-index: 100; pointer-events: none; width: 200%; height: 200%;
@@ -71,8 +113,13 @@ em { font-style: italic; }
 .nav__links a { position: relative; padding-bottom: 3px; }
 .nav__links a span { font-size: 0.62rem; opacity: 0.6; margin-right: 0.15rem; vertical-align: 1px; }
 .nav__links a::after { content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform 0.45s var(--ease); }
-.nav__links a:hover::after { transform: scaleX(1); transform-origin: left; }
-@media (max-width: 620px) { .nav__links { gap: 0.95rem; font-size: 0.75rem; } .nav__links a span { display: none; } }
+.nav__links a:hover::after, .nav__links a.is-active::after { transform: scaleX(1); transform-origin: left; }
+@media (max-width: 620px) {
+  .nav__links { gap: 1.1rem; font-size: 0.75rem; }
+  .nav__links a span { display: none; }
+  .nav__links a { padding: 0.55rem 0.15rem; } /* zone de tap confortable */
+  .nav__links a::after { bottom: 0.3rem; }
+}
 
 /* ------------------------------ Hero / Showreel ------------------------------ */
 .hero { position: relative; min-height: 100dvh; overflow: hidden; color: #f4f3f0; }
@@ -200,8 +247,22 @@ em { font-style: italic; }
 .is-revealed[data-reveal] { opacity: 1; transform: none; transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
 
 /* ------------------------------ Reduced motion ------------------------------ */
+/* ------------------------------ Mobile ------------------------------ */
+@media (max-width: 620px) {
+  .filter__btn { padding: 0.5rem 0.25rem; } /* zone de tap confortable */
+  .filter__btn::after { bottom: 0.28rem; }
+  .contact { flex-direction: column; align-items: flex-start; gap: 1.1rem; }
+  .contact__social { margin-left: 0; gap: 1.75rem; }
+  .contact__social a { padding: 0.3rem 0; }
+  .contact__mail { padding: 0.2rem 0; }
+  .contact__year { padding-top: 0.75rem; }
+  .work:hover .work__img { transform: none; } /* pas de zoom fantôme au tap */
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; }
+  html.js body { opacity: 1 !important; transition: none !important; }
+  .cursor, .progress { display: none; }
   .grain { display: none; }
   [data-reveal] { opacity: 1; transform: none; }
   .work__media { clip-path: none; }
