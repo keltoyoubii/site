@@ -16,9 +16,44 @@
   const p = projects[idx];
   const next = projects[(idx + 1) % projects.length];
 
-  document.title = `${p.title} — Maëldan`;
+  document.title = `${p.title} — ${p.type} · Maëldan`;
   const yearEl = document.querySelector(".contact__year");
   if (yearEl) yearEl.textContent = "© Maëldan Delpy " + new Date().getFullYear();
+
+  /* -------------------- SEO : méta dynamiques + données structurées -------------------- */
+  const SITE = "https://maeldan.fr";
+  const pageUrl = `${SITE}/projet.html?id=${encodeURIComponent(p.slug)}`;
+  const coverUrl = p.images ? `${SITE}/assets/projets/${p.slug}/01.webp` : `${SITE}/assets/og.jpg`;
+  const metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) metaDesc.setAttribute("content", p.desc);
+  const canon = document.createElement("link");
+  canon.rel = "canonical"; canon.href = pageUrl;
+  document.head.appendChild(canon);
+  const setOg = (prop, val) => {
+    let m = document.querySelector(`meta[property="${prop}"]`);
+    if (!m) { m = document.createElement("meta"); m.setAttribute("property", prop); document.head.appendChild(m); }
+    m.setAttribute("content", val);
+  };
+  setOg("og:title", `${p.title} — ${p.type} · Maëldan`);
+  setOg("og:description", p.desc);
+  setOg("og:url", pageUrl);
+  setOg("og:image", coverUrl);
+  const ld = document.createElement("script");
+  ld.type = "application/ld+json";
+  ld.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": p.title,
+    "headline": `${p.title} — ${p.type}`,
+    "description": p.desc,
+    "url": pageUrl,
+    "image": coverUrl,
+    "inLanguage": "fr-FR",
+    "genre": p.type,
+    ...(p.year ? { "dateCreated": String(p.year) } : {}),
+    "creator": { "@type": "Person", "name": "Maëldan Delpy", "url": SITE + "/" }
+  });
+  document.head.appendChild(ld);
 
   const num = String(idx + 1).padStart(2, "0");
   const total = String(projects.length).padStart(2, "0");

@@ -40,3 +40,18 @@ Pour la changer : modifier l'`iframe` dans `index.html`.
 ## Déployer (GitHub Pages)
 Settings → Pages → branche `claude/quirky-curie-i5rayc`, dossier `/ (root)`.
 En ligne sur `https://keltoyoubii.github.io/site/`.
+
+## Domaine maeldan.fr (SEO)
+Le SEO (canonical, sitemap, Open Graph, JSON-LD) est configuré pour `https://maeldan.fr`.
+1. Acheter `maeldan.fr` (OVH, Gandi, Ionos…).
+2. Chez le registrar, créer 4 enregistrements A sur `@` :
+   `185.199.108.153` · `185.199.109.153` · `185.199.110.153` · `185.199.111.153`
+   et un CNAME `www` → `keltoyoubii.github.io`.
+3. GitHub → Settings → Pages → Custom domain : `maeldan.fr`, puis cocher **Enforce HTTPS**.
+4. Google Search Console : ajouter la propriété `maeldan.fr` (validation DNS) et
+   soumettre `https://maeldan.fr/sitemap.xml`.
+
+## SEO — à maintenir
+- `sitemap.xml` : ajouter une ligne `<url>` à chaque nouveau projet.
+- `assets/og.jpg` : image de partage (1200×630) pour réseaux sociaux.
+- Les pages projet génèrent leurs méta (title, description, canonical, JSON-LD) en JS.
