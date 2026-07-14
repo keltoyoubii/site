@@ -83,9 +83,6 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
   [data-cursor], [data-cursor] * { cursor: none; }
 }
 
-/* --------------------- Liens magnétiques --------------------- */
-.magnetic { display: inline-block; will-change: transform; transition: transform 0.3s var(--ease); }
-
 /* ------------------------------ Grain ------------------------------ */
 .grain {
   position: fixed; inset: -50%; z-index: 100; pointer-events: none; width: 200%; height: 200%;
@@ -192,37 +189,67 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
 
 /* ------------------------------ À propos ------------------------------ */
 .about { padding: clamp(4rem, 10vh, 7rem) var(--pad) clamp(5rem, 13vh, 9rem); }
-.about__head { max-width: var(--maxw); margin: 0 auto clamp(3rem, 8vh, 6rem); border-top: 1px solid var(--line); padding-top: clamp(2rem, 5vh, 3.5rem); }
+.about__head { max-width: var(--maxw); margin: 0 auto clamp(1rem, 3vh, 2rem); border-top: 1px solid var(--line); padding-top: clamp(2rem, 5vh, 3.5rem); }
 .about__kicker { display: block; color: var(--fg-muted); margin-bottom: clamp(0.75rem, 2vh, 1.5rem); }
 .about__big { font-family: var(--font-hand); font-weight: 400; font-size: clamp(3.25rem, 12vw, 9.5rem); line-height: 1.02; letter-spacing: 0; }
-.about__grid { max-width: var(--maxw); margin: 0 auto; display: grid; grid-template-columns: minmax(260px, 38%) 1fr; gap: clamp(2.5rem, 6vw, 6rem); align-items: start; }
+/* Composition libre : grille 12 colonnes, éléments décalés façon collage */
+.about__grid { max-width: var(--maxw); margin: 0 auto; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: clamp(1rem, 2.5vw, 2.5rem); align-items: start; }
 
-.about__portrait { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: #e7e6e2; }
-.about__portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.1s var(--ease); }
-.about__portrait img.is-active { opacity: 1; }
+/* Portrait façon tirage photo posé de travers, il remonte sur le titre */
+.about__portrait {
+  grid-column: 8 / 13; grid-row: 1 / span 3; z-index: 1; justify-self: end;
+  width: 100%; max-width: 440px;
+  margin: calc(-1 * clamp(3rem, 9vw, 8rem)) clamp(0px, 2vw, 2rem) 0 0;
+  transform: rotate(-2.4deg);
+  background: #fff; padding: clamp(0.5rem, 1vw, 0.85rem); padding-bottom: 0.3rem;
+  box-shadow: 0 22px 55px -32px rgba(12, 12, 12, 0.4);
+}
+.about__frame { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: #e7e6e2; }
+.about__frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.1s var(--ease); }
+.about__frame img.is-active { opacity: 1; }
+.about__caption { display: block; text-align: center; font-size: clamp(0.95rem, 1.3vw, 1.25rem); padding: 0.6rem 0 0.45rem; }
 
-.about__body { padding-top: 0.25rem; }
-.about__eyebrow { color: var(--fg-muted); margin-bottom: clamp(1.2rem, 2.5vw, 2rem); }
-.about__lead { font-family: var(--font-title); font-weight: 700; font-size: clamp(1.8rem, 3.6vw, 3.4rem); line-height: 1.05; letter-spacing: -0.03em; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+/* Sur-titre façon tampon penché */
+.about__eyebrow {
+  grid-column: 1 / 8; grid-row: 1; justify-self: start;
+  border: 1px solid var(--fg); padding: 0.55rem 0.85rem 0.5rem;
+  transform: rotate(-1.7deg); margin: 0.5rem 0 clamp(1.8rem, 4vw, 3.25rem);
+}
+.about__lead { grid-column: 1 / 8; grid-row: 2; font-family: var(--font-title); font-weight: 700; font-size: clamp(1.8rem, 3.6vw, 3.4rem); line-height: 1.05; letter-spacing: -0.03em; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
 .about__lead .word { display: inline-block; overflow: hidden; vertical-align: top; }
 .about__lead .word__in { display: inline-block; will-change: transform; }
-.about__text p { color: var(--fg); font-size: clamp(1rem, 1.15vw, 1.15rem); line-height: 1.6; max-width: 60ch; }
-.about__block { margin-top: clamp(2.5rem, 5vw, 4rem); border-top: 1px solid var(--line); padding-top: clamp(1.5rem, 3vw, 2.5rem); }
-.about__h { font-size: clamp(1.5rem, 3vw, 2.4rem); letter-spacing: -0.02em; margin-bottom: 1.2rem; }
-.services { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.4rem, 3vw, 2.2rem) clamp(1rem, 2vw, 1.5rem); max-width: 620px; }
+
+/* Paragraphe décalé d'une colonne : rompt l'alignement gauche */
+.about__text { grid-column: 2 / 8; grid-row: 3; }
+.about__text p { color: var(--fg); font-size: clamp(1rem, 1.15vw, 1.15rem); line-height: 1.6; max-width: 56ch; }
+
+.about__block { grid-column: 1 / 13; grid-row: 4; margin-top: clamp(3rem, 6vw, 5rem); }
+.about__h { display: block; font-size: clamp(1.5rem, 3vw, 2.4rem); letter-spacing: -0.02em; margin-bottom: 0.35rem; }
+.about__squiggle { display: block; width: min(300px, 62%); height: auto; margin: 0 0 clamp(1.75rem, 3.4vw, 2.75rem); fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; filter: url(#scribble); }
+
+/* Interventions : posées à la main, chacune un peu de travers */
+.services { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.8rem, 3.6vw, 2.8rem) clamp(1.2rem, 2.4vw, 2rem); max-width: 780px; }
 .serv { display: flex; flex-direction: column; gap: 0.65rem; }
+.serv:nth-child(1) { transform: rotate(-1.5deg); }
+.serv:nth-child(2) { transform: translateY(clamp(8px, 1.6vw, 20px)) rotate(1.4deg); }
+.serv:nth-child(3) { transform: translateY(-4px) rotate(-0.8deg); }
+.serv:nth-child(4) { transform: translateY(6px) rotate(-1.8deg); }
+.serv:nth-child(5) { transform: translateY(clamp(6px, 1.4vw, 16px)) rotate(1deg); }
+.serv:nth-child(6) { transform: translateY(-3px) rotate(2deg); }
 .serv__ico { display: block; }
-.serv__ico svg { width: clamp(34px, 4.2vw, 44px); height: auto; overflow: visible; fill: none; stroke: currentColor; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; filter: url(#scribble); transition: transform 0.45s var(--ease); }
+.serv__ico svg { width: clamp(38px, 4.8vw, 52px); height: auto; overflow: visible; fill: none; stroke: currentColor; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; filter: url(#scribble); transition: transform 0.45s var(--ease); }
 .serv:hover .serv__ico svg { transform: rotate(-4deg) scale(1.07); }
 .serv__lbl { font-size: 0.92rem; line-height: 1.3; }
 .scribble-def { position: absolute; }
 @media (max-width: 560px) { .services { grid-template-columns: repeat(2, 1fr); } }
 
-@media (min-width: 861px) { .about__portrait { position: sticky; top: 14vh; } }
 @media (max-width: 860px) {
-  .about__grid { grid-template-columns: 1fr; }
-  .about__portrait { max-width: 420px; }
-  .about__services { columns: 1; }
+  .about__head { margin-bottom: clamp(1.75rem, 4vh, 2.5rem); }
+  .about__grid { display: block; }
+  .about__portrait { max-width: 340px; margin: 0 0 2.25rem; transform: rotate(-2deg); }
+  .about__eyebrow { display: inline-block; margin: 0 0 1.5rem; }
+  .about__lead { margin-bottom: 1.5rem; }
+  .about__text { margin-left: clamp(0px, 5vw, 2.5rem); }
 }
 
 /* ------------------------------ Contact ------------------------------ */
@@ -267,7 +294,7 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
   [data-reveal] { opacity: 1; transform: none; }
   .work__media { clip-path: none; }
   .work__left, .work__meta { opacity: 1; transform: none; }
-  .about__portrait img { opacity: 1; }
+  .about__frame img { opacity: 1; }
   .word__in { transform: none !important; }
   .linewrap__in { opacity: 1 !important; transform: none !important; }
   .type-caret { display: none; }

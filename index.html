@@ -116,22 +116,25 @@
       </div>
 
       <div class="about__grid">
-        <div class="about__portrait" data-slideshow aria-label="Maëldan Delpy">
-          <img src="assets/portrait/01.webp" alt="Maëldan Delpy" class="is-active" />
-          <img src="assets/portrait/02.webp" alt="" aria-hidden="true" />
-          <img src="assets/portrait/03.webp" alt="" aria-hidden="true" />
+        <figure class="about__portrait" data-slideshow aria-label="Maëldan Delpy">
+          <div class="about__frame">
+            <img src="assets/portrait/01.webp" alt="Maëldan Delpy" class="is-active" />
+            <img src="assets/portrait/02.webp" alt="" aria-hidden="true" />
+            <img src="assets/portrait/03.webp" alt="" aria-hidden="true" />
+          </div>
+          <figcaption class="about__caption hw">entre Bordeaux &amp; Paris</figcaption>
+        </figure>
+
+        <p class="about__eyebrow lbl">Maëldan Delpy — Bordeaux, Paris</p>
+        <p class="about__lead" data-lines>Créateur visuel pluridisciplinaire, du portrait à la direction artistique de marque.</p>
+
+        <div class="about__text">
+          <p data-typewriter>Je développe depuis plusieurs années une pratique de l'image qui mêle réalisation vidéo, motion design, photographie et graphisme, sans jamais séparer ces disciplines. J'interviens sur des projets artistiques comme sur des commandes — entreprises, institutions, associations, particuliers — avec la même attention portée à la narration, au rythme et à la fabrication des images.</p>
         </div>
 
-        <div class="about__body">
-          <p class="about__eyebrow lbl">Maëldan Delpy — Bordeaux, Paris</p>
-          <p class="about__lead" data-lines>Créateur visuel pluridisciplinaire, du portrait à la direction artistique de marque.</p>
-
-          <div class="about__text">
-            <p data-typewriter>Je développe depuis plusieurs années une pratique de l'image qui mêle réalisation vidéo, motion design, photographie et graphisme, sans jamais séparer ces disciplines. J'interviens sur des projets artistiques comme sur des commandes — entreprises, institutions, associations, particuliers — avec la même attention portée à la narration, au rythme et à la fabrication des images.</p>
-          </div>
-
-          <div class="about__block" data-reveal>
-            <h3 class="about__h">Interventions</h3>
+        <div class="about__block" data-reveal>
+          <h3 class="about__h">Interventions</h3>
+          <svg class="about__squiggle" viewBox="0 0 320 14" aria-hidden="true"><path d="M3 9 C 60 3, 120 13, 180 7 S 280 4, 317 8" /></svg>
 
             <!-- filtre "scribble" : donne un tremblé fait-main aux icônes -->
             <svg width="0" height="0" class="scribble-def" aria-hidden="true"><defs>
@@ -164,7 +167,6 @@
                 <span class="serv__lbl">Direction artistique &amp; graphisme</span>
               </li>
             </ul>
-          </div>
         </div>
       </div>
     </section>
