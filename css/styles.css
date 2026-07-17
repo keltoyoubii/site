@@ -56,6 +56,11 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
   transform: scaleX(0); transform-origin: left; pointer-events: none;
 }
 
+/* --------------------- Étoiles au clic --------------------- */
+.spark { position: fixed; z-index: 130; pointer-events: none; mix-blend-mode: difference; }
+.spark svg { fill: #fff; }
+.spark svg * { fill: inherit; }
+
 /* ------------------------------ Grain ------------------------------ */
 .grain {
   position: fixed; inset: -50%; z-index: 100; pointer-events: none; width: 200%; height: 200%;
