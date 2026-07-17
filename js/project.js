@@ -23,7 +23,7 @@
   /* -------------------- SEO : méta dynamiques + données structurées -------------------- */
   const SITE = "https://maeldan.fr";
   const pageUrl = `${SITE}/projet.html?id=${encodeURIComponent(p.slug)}`;
-  const coverUrl = p.images ? `${SITE}/assets/projets/${p.slug}/01.webp` : `${SITE}/assets/og.jpg`;
+  const coverUrl = p.cover ? `${SITE}/${p.cover}` : (p.images ? `${SITE}/assets/projets/${p.slug}/01.webp` : `${SITE}/assets/og.jpg`);
   const metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) metaDesc.setAttribute("content", p.desc);
   const canon = document.createElement("link");

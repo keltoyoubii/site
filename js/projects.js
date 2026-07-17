@@ -7,7 +7,7 @@
    ========================================================================= */
 
 window.PROJECTS = [
-  { slug: "reflet", title: "Reflet", type: "Vidéo — Contenu produit", cat: "video", images: 2, shapes: "vv", vimeo: ["1208777629"],
+  { slug: "reflet", title: "Reflet", type: "Vidéo — Contenu produit", cat: "video", images: 3, shapes: "vvh", cover: "assets/projets/reflet/03.webp", vimeo: ["1208777629"],
     yt: ["_9e64kzqg_A","OPZN22Yxz18","11Gz2rNdVq4","Ts5ZgpUMHRw","C_J5y-JWzjM","W5rxqsUMRnI","10YRNQS3wQ8","QzQOIpLrpt8"],
     desc: "Contenus pour la marque de soin Reflet : packshots de flacons, textures et unboxing. Éclairage studio net et moderne.", ambiance: "Commerciale, moderne, épurée." },
 
