@@ -105,7 +105,7 @@
           { transform: "scale(0.9) rotate(14deg)", opacity: 0.9, offset: 0.7 },
           { transform: "scale(0) rotate(26deg)", opacity: 0 },
         ],
-        { duration: 620, easing: "cubic-bezier(0.16, 1, 0.3, 1)" }
+        { duration: 620, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "forwards" }
       );
 
       // particules : petites étoiles qui fusent en cercle
@@ -123,7 +123,7 @@
             { transform: `translate(${dx * 0.72}px, ${dy * 0.72}px) scale(0.72) rotate(${rot * 0.7}deg)`, opacity: 1, offset: 0.55 },
             { transform: `translate(${dx}px, ${dy}px) scale(0.35) rotate(${rot}deg)`, opacity: 0 },
           ],
-          { duration: 520 + Math.random() * 260, easing: "cubic-bezier(0.16, 1, 0.3, 1)" }
+          { duration: 520 + Math.random() * 260, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "forwards" }
         );
       }
       setTimeout(() => wrap.remove(), 800);
