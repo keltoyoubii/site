@@ -48,7 +48,7 @@ window.PROJECTS = [
   { slug: "cap-metiers", title: "Cap Métiers", type: "Motion design", cat: "motion", images: 0, vimeo: ["1208776567"],
     desc: "Mix de séquences motion design réalisées pour Cap Métiers Nouvelle-Aquitaine.", ambiance: "Corporate, animé, institutionnel." },
 
-  { slug: "web", duo: true, duoPair: [1, 3], title: "Web", type: "Photographie — Éditorial nocturne", cat: "photographie", images: 5, shapes: "vvvvh",
+  { slug: "web", duo: true, duoPair: [1, 3], title: "Web", type: "Photographie — Éditorial nocturne", cat: "photographie", images: 5, shapes: "vvvvh", vimeo: ["1208776061"],
     desc: "Série de groupe en nocturne, flash direct et voiture. Esthétique « crew » très années 2000.", ambiance: "Nocturne, urbaine, collective." },
 
   { slug: "dopamoon", title: "Dopamoon — Dopalova", type: "Vidéo — Clip musical", cat: "video", images: 0, vimeo: ["1208775751"],

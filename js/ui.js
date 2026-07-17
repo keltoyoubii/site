@@ -1,13 +1,11 @@
 /* =========================================================================
    UI premium partagée (accueil + pages projet)
-   — transitions de page, curseur contextuel, barre de progression,
-     liens magnétiques, section active dans la nav
+   — transitions de page, barre de progression, section active dans la nav
    ========================================================================= */
 (function () {
   "use strict";
 
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const finePointer = window.matchMedia("(pointer: fine)").matches;
   const html = document.documentElement;
 
   /* -------------------- Transitions de page -------------------- */
@@ -62,39 +60,4 @@
     window.addEventListener("scroll", () => { if (!spyRaf) { spyRaf = true; requestAnimationFrame(updSpy); } }, { passive: true });
     updSpy();
   }
-
-  if (!finePointer || prefersReduced) return; // tactile / motion réduit : rien de plus
-
-  /* -------------------- Curseur contextuel -------------------- */
-  document.querySelectorAll(".work").forEach((el) => { el.dataset.cursor = "Voir →"; });
-  document.querySelectorAll(".proj__next a").forEach((el) => { el.dataset.cursor = "Suivant →"; });
-  document.querySelectorAll(".ytfacade").forEach((el) => { el.dataset.cursor = "Lire"; });
-
-  const cur = document.createElement("div");
-  cur.className = "cursor";
-  cur.setAttribute("aria-hidden", "true");
-  cur.innerHTML = '<span class="cursor__lbl"></span>';
-  document.body.appendChild(cur);
-  const lbl = cur.querySelector(".cursor__lbl");
-
-  let cx = window.innerWidth / 2, cy = window.innerHeight / 2, tx = cx, ty = cy;
-  document.addEventListener("mousemove", (e) => {
-    tx = e.clientX; ty = e.clientY;
-    cur.classList.add("is-on");
-    const t = e.target.closest("[data-cursor]");
-    if (t && !t.classList.contains("is-playing")) {
-      if (lbl.textContent !== t.dataset.cursor) lbl.textContent = t.dataset.cursor;
-      cur.classList.add("is-label");
-    } else {
-      cur.classList.remove("is-label");
-    }
-  }, { passive: true });
-  document.addEventListener("mouseleave", () => cur.classList.remove("is-on"));
-  document.addEventListener("mousedown", () => cur.classList.add("is-down"));
-  document.addEventListener("mouseup", () => cur.classList.remove("is-down"));
-  (function loop() {
-    cx += (tx - cx) * 0.22; cy += (ty - cy) * 0.22;
-    cur.style.transform = `translate(${cx}px, ${cy}px)`;
-    requestAnimationFrame(loop);
-  })();
 })();

@@ -56,33 +56,6 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
   transform: scaleX(0); transform-origin: left; pointer-events: none;
 }
 
-/* --------------------- Curseur contextuel --------------------- */
-.cursor {
-  position: fixed; left: 0; top: 0; z-index: 150; pointer-events: none;
-  width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%;
-  background: #fff; mix-blend-mode: difference; opacity: 0;
-  display: flex; align-items: center; justify-content: center;
-  transition: opacity 0.3s ease, width 0.38s var(--ease), height 0.38s var(--ease),
-              margin 0.38s var(--ease), background 0.3s ease;
-}
-.cursor.is-on { opacity: 1; }
-.cursor.is-down { transition-duration: 0.15s; }
-.cursor.is-down:not(.is-label) { width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; }
-.cursor__lbl {
-  font-family: var(--font-title); font-weight: 500; font-size: 0.62rem;
-  letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg);
-  opacity: 0; transition: opacity 0.25s ease 0.08s; white-space: nowrap;
-}
-.cursor.is-label {
-  width: 86px; height: 86px; margin: -43px 0 0 -43px;
-  mix-blend-mode: normal; background: rgba(244, 243, 240, 0.88);
-  backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-}
-.cursor.is-label .cursor__lbl { opacity: 1; }
-@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  [data-cursor], [data-cursor] * { cursor: none; }
-}
-
 /* ------------------------------ Grain ------------------------------ */
 .grain {
   position: fixed; inset: -50%; z-index: 100; pointer-events: none; width: 200%; height: 200%;
@@ -289,7 +262,7 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; }
   html.js body { opacity: 1 !important; transition: none !important; }
-  .cursor, .progress { display: none; }
+  .progress { display: none; }
   .grain { display: none; }
   [data-reveal] { opacity: 1; transform: none; }
   .work__media { clip-path: none; }
