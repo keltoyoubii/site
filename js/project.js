@@ -125,6 +125,74 @@
     });
   });
 
+  /* -------------------- Lightbox galerie -------------------- */
+  let lenis = null; // assigné plus bas si le smooth scroll est actif
+  const figs = Array.from(document.querySelectorAll(".proj__img img"));
+  if (figs.length) {
+    const lb = document.createElement("div");
+    lb.className = "lightbox";
+    lb.setAttribute("role", "dialog");
+    lb.setAttribute("aria-modal", "true");
+    lb.setAttribute("aria-label", `Galerie — ${p.title}`);
+    lb.innerHTML = `
+      <div class="lightbox__stage"><img alt="" /></div>
+      <button class="lightbox__close" type="button" aria-label="Fermer">✕</button>
+      <button class="lightbox__prev" type="button" aria-label="Image précédente">←</button>
+      <button class="lightbox__next" type="button" aria-label="Image suivante">→</button>
+      <span class="lightbox__count lbl"></span>`;
+    document.body.appendChild(lb);
+    const img = lb.querySelector(".lightbox__stage img");
+    const countEl = lb.querySelector(".lightbox__count");
+    let cur = 0, isOpen = false;
+
+    const show = (i) => {
+      cur = (i + figs.length) % figs.length;
+      img.src = figs[cur].currentSrc || figs[cur].src;
+      img.alt = figs[cur].alt || "";
+      countEl.textContent = `${String(cur + 1).padStart(2, "0")} / ${String(figs.length).padStart(2, "0")}`;
+      if ("animate" in img) img.animate(
+        [{ opacity: 0, transform: "scale(0.985)" }, { opacity: 1, transform: "scale(1)" }],
+        { duration: 380, easing: "cubic-bezier(0.16, 1, 0.3, 1)" });
+      [cur + 1, cur - 1].forEach((n) => { // précharge les voisines
+        const f = figs[(n + figs.length) % figs.length];
+        const pre = new Image(); pre.src = f.currentSrc || f.src;
+      });
+    };
+    const openLb = (i) => {
+      isOpen = true; show(i);
+      lb.classList.add("is-open");
+      document.documentElement.classList.add("lb-lock");
+      if (lenis) lenis.stop();
+      lb.querySelector(".lightbox__close").focus();
+    };
+    const closeLb = () => {
+      isOpen = false;
+      lb.classList.remove("is-open");
+      document.documentElement.classList.remove("lb-lock");
+      if (lenis) lenis.start();
+    };
+
+    figs.forEach((f, i) => { f.closest(".proj__img").addEventListener("click", () => openLb(i)); });
+    img.addEventListener("click", () => show(cur + 1)); // clic sur l'image : suivante
+    lb.querySelector(".lightbox__close").addEventListener("click", closeLb);
+    lb.querySelector(".lightbox__prev").addEventListener("click", () => show(cur - 1));
+    lb.querySelector(".lightbox__next").addEventListener("click", () => show(cur + 1));
+    lb.addEventListener("click", (e) => { if (e.target === lb || e.target.classList.contains("lightbox__stage")) closeLb(); });
+    document.addEventListener("keydown", (e) => {
+      if (!isOpen) return;
+      if (e.key === "Escape") closeLb();
+      else if (e.key === "ArrowRight") { e.preventDefault(); show(cur + 1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); show(cur - 1); }
+    });
+    let swipeX = null;
+    lb.addEventListener("touchstart", (e) => { swipeX = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener("touchend", (e) => {
+      if (swipeX === null) return;
+      const dx = e.changedTouches[0].clientX - swipeX; swipeX = null;
+      if (Math.abs(dx) > 45) show(cur + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+  }
+
   /* -------------------- Motion -------------------- */
   if (prefersReduced || !hasGSAP) {
     document.querySelectorAll(".proj__video, .proj__img").forEach((el) => el.classList.add("is-in"));
@@ -132,7 +200,7 @@
   }
   gsap.registerPlugin(ScrollTrigger);
   if (window.Lenis) {
-    const lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+    lenis = new Lenis({ duration: 1.1, smoothWheel: true });
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add((t) => lenis.raf(t * 1000));
     gsap.ticker.lagSmoothing(0);
