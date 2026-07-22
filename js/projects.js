@@ -15,7 +15,7 @@ window.PROJECTS = [
     yt: ["_9e64kzqg_A","OPZN22Yxz18","11Gz2rNdVq4","Ts5ZgpUMHRw","C_J5y-JWzjM","W5rxqsUMRnI","10YRNQS3wQ8","QzQOIpLrpt8"],
     desc: "Contenus pour la marque de soin Reflet : packshots de flacons, textures et unboxing. Éclairage studio net et moderne.", ambiance: "Commerciale, moderne, épurée." },
 
-  { slug: "nina-plage", title: "Nina — Plage", type: "Photographie — Éditorial mode & beauté", cat: "photographie", images: 9, shapes: "hhhhhvvhh",
+  { slug: "nina-plage", title: "Nina — Plage", type: "Photographie — Éditorial mode & beauté", cat: "photographie", images: 9, shapes: "hhhhhvvhh", bunny: ["2c3556ec-2a3f-4c6a-b28c-aded8c956c57"],
     desc: "Éditorial de plage au crépuscule avec la mannequin Nina Albaut : robe blanche fluide, vent et embruns sur fond bleu profond.", ambiance: "Onirique, crépusculaire, éthérée." },
 
   { slug: "tattoo-family", title: "Tattoo Family", type: "Vidéo — Documentaire", cat: "video", images: 1, shapes: "v", vimeo: ["1208771663", "1208771666"],
