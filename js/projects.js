@@ -30,7 +30,7 @@ window.PROJECTS = [
   { slug: "90-regards", duo: true, title: "90 Regards", type: "Identité visuelle — Charte graphique", cat: "graphisme", images: 6, shapes: "vvvvvv",
     desc: "Création d'identité visuelle pour une marque de vêtements workwear fait main, made in France.", ambiance: "" },
 
-  { slug: "mariage-chloe-nico", title: "Chloé & Nicolas", type: "Vidéo — Aftermovie mariage", cat: "video", images: 0, vimeo: ["1208774915"],
+  { slug: "mariage-chloe-nico", title: "Chloé & Nicolas", type: "Vidéo — Aftermovie mariage", cat: "video", images: 0, bunny: ["710241/c0cd3880-3fdb-4a5b-b4f1-4ab04df6491d"],
     desc: "Aftermovie de mariage, écriture cinématographique. « Cinematic wedding video for lovers. »", ambiance: "Romantique, vintage, onirique." },
 
   { slug: "annihilation", duo: true, title: "Annihilation", type: "Photographie — Portrait", cat: "photographie", images: 2, shapes: "vv",
