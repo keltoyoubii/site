@@ -43,7 +43,7 @@ window.PROJECTS = [
   { slug: "igor", duo: true, title: "Igor", type: "Direction artistique — Covers musicales", cat: "graphisme", images: 12, shapes: "vvvvvvvvvvvv",
     desc: "Pochettes pour l'univers éclectique d'Igor. Ciels de nuit, pluie numérique et silhouettes travaillées.", ambiance: "Nocturne, urbaine, cinématographique." },
 
-  { slug: "anti", title: "Anti × Keutchi", type: "Vidéo — Publicité", cat: "video", images: 7, shapes: "hhhhvvv", vimeo: ["1208774916"],
+  { slug: "anti", title: "Anti × Keutchi", type: "Vidéo — Publicité", cat: "video", images: 7, shapes: "hhhhvvv", bunny: ["65b6319b-0d9e-4b7d-bcf8-dd02e0d695b2"],
     desc: "La marque Anti collabore avec l'artiste Keutchi pour sa collection de pièces Levi's vintage. Film de présentation tourné dans une caravane abandonnée et dans les vignes sous un ciel orageux.", ambiance: "Brute, orageuse." },
 
   { slug: "snaptrox", title: "Snaptrox", type: "Photographie — Automobile & lifestyle", cat: "photographie", images: 3, shapes: "hvv",
