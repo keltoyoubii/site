@@ -61,6 +61,9 @@
 
   /* -------------------- Médias -------------------- */
   let vids = "";
+  (p.bunny || []).forEach((id) => {
+    vids += `<figure class="proj__video"><div class="embed"><iframe src="https://player.mediadelivery.net/embed/${id}?autoplay=true&loop=true&muted=true&preload=true&responsive=true" title="${esc(p.title)}" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div></figure>`;
+  });
   (p.vimeo || []).forEach((id) => {
     vids += `<figure class="proj__video"><div class="embed"><iframe src="https://player.vimeo.com/video/${id}?dnt=1&title=0&byline=0&portrait=0" title="${esc(p.title)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div></figure>`;
   });

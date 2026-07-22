@@ -7,7 +7,7 @@
    ========================================================================= */
 
 window.PROJECTS = [
-  { slug: "reflet", title: "Reflet", type: "Vidéo — Contenu produit", cat: "video", images: 3, shapes: "vvh", cover: "assets/projets/reflet/03.webp", vimeo: ["1208777629"],
+  { slug: "reflet", title: "Reflet", type: "Vidéo — Contenu produit", cat: "video", images: 3, shapes: "vvh", cover: "assets/projets/reflet/03.webp", bunny: ["710241/0c9043ce-79ac-452c-a5b4-0df20088ed37", "710241/8266ebff-b673-4385-afb4-547241b02b84"],
     yt: ["_9e64kzqg_A","OPZN22Yxz18","11Gz2rNdVq4","Ts5ZgpUMHRw","C_J5y-JWzjM","W5rxqsUMRnI","10YRNQS3wQ8","QzQOIpLrpt8"],
     desc: "Contenus pour la marque de soin Reflet : packshots de flacons, textures et unboxing. Éclairage studio net et moderne.", ambiance: "Commerciale, moderne, épurée." },
 
@@ -68,7 +68,7 @@ window.PROJECTS = [
   { slug: "luxie", title: "Luxie", type: "Photographie — Cover", cat: "photographie", images: 4, shapes: "hvhv",
     desc: "Série intimiste pour l'artiste Luxie.", ambiance: "Intime, rêveuse, musicale." },
 
-  { slug: "amaury", duo: true, title: "Amaury × Amë Lorette", type: "Vidéo — Publicité", cat: "video", images: 0, vimeo: ["1208778430", "1208778431"],
+  { slug: "amaury", duo: true, title: "Amaury × Amë Lorette", type: "Vidéo — Publicité", cat: "video", images: 0, bunny: ["710241/bfe2c956-f084-4534-ac69-a5707e745245", "710241/74000df8-a389-4de0-97d3-8999ac9f05b3"],
     desc: "Campagne social pour la marque de lunettes Amaury Paris, en collaboration avec l'artiste Amë Lorette.", ambiance: "Mixed media, coloré, éditorial." },
 
   { slug: "nowhere-drive", title: "Nowhere Drive", type: "Photographie — Série narrative", cat: "photographie", images: 10, shapes: "hhhhvvhhhh",
