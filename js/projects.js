@@ -51,7 +51,7 @@ window.PROJECTS = [
   { slug: "web", duo: true, duoPair: [1, 3], title: "Web", type: "Photographie — Éditorial nocturne", cat: "photographie", images: 5, shapes: "vvvvh", bunny: ["710241/f4246b77-aaf4-49b9-b935-d7d302b0fd02"],
     desc: "Série de groupe en nocturne, flash direct et voiture. Esthétique « crew » très années 2000.", ambiance: "Nocturne, urbaine, collective." },
 
-  { slug: "dopamoon", title: "Dopamoon — Dopalova", type: "Vidéo — Clip musical", cat: "video", images: 0, vimeo: ["1208775751"],
+  { slug: "dopamoon", title: "Dopamoon — Dopalova", type: "Vidéo — Clip musical", cat: "video", images: 0, bunny: ["710241/bc575247-3e55-49be-9490-215b5605249b"],
     yt: ["x8LqjBa711A","_MK2Iso0LaQ","JHd2XkOoGAo","-uYufwjSEfI"],
     desc: "Réalisation de clips pour le groupe Dopamoon, issus de leur album DOPALOVA produit par ALTER K.", ambiance: "Funky, vintage, lifestyle." },
 
