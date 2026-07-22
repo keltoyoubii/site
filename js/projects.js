@@ -61,7 +61,7 @@ window.PROJECTS = [
   { slug: "milinkostaud", title: "Milinkostaud", type: "Identité visuelle — Charte graphique", cat: "graphisme", images: 7, shapes: "hhhhhhh",
     desc: "Identité d'un coach musculation & coaching en ligne. Logo pictural, typographie grasse, palette vert / noir. Signature : « Transforme ton corps, dépasse tes limites ».", ambiance: "Athlétique, déterminée, premium." },
 
-  { slug: "emma-bareille", title: "Emma Bareille — J'aime la pluie", type: "Vidéo — Clips musicaux", cat: "video", images: 0, vimeo: ["1208771667"],
+  { slug: "emma-bareille", title: "Emma Bareille — J'aime la pluie", type: "Vidéo — Clips musicaux", cat: "video", images: 0, bunny: ["710241/018f80f9-4d12-4323-99c0-c4a80253eabc"],
     yt: ["_QW--9xcPwY","84MBrus1rCI","TwhwCnEbycw","X1RK0pT0zJQ","kiUG9SjH57I"],
     desc: "Clips pour l'artiste Emma Bareille : reflets dans les flaques, gouttes et voiles de tissu. Traitement poétique et aquatique.", ambiance: "Poétique, aquatique, onirique." },
 
