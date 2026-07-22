@@ -11,7 +11,7 @@ window.PROJECTS = [
     yt: ["_9e64kzqg_A","OPZN22Yxz18","11Gz2rNdVq4","Ts5ZgpUMHRw","C_J5y-JWzjM","W5rxqsUMRnI","10YRNQS3wQ8","QzQOIpLrpt8"],
     desc: "Contenus pour la marque de soin Reflet : packshots de flacons, textures et unboxing. Éclairage studio net et moderne.", ambiance: "Commerciale, moderne, épurée." },
 
-  { slug: "nina-plage", title: "Nina — Plage", type: "Photographie — Éditorial mode & beauté", cat: "photographie", images: 9, shapes: "hhhhhvvhh",
+  { slug: "nina-plage", title: "Nina — Plage", type: "Photographie — Éditorial mode & beauté", cat: "photographie", images: 9, shapes: "hhhhhvvhh", bunny: ["710241/2c3556ec-2a3f-4c6a-b28c-aded8c956c57"],
     desc: "Éditorial de plage au crépuscule avec la mannequin Nina Albaut : robe blanche fluide, vent et embruns sur fond bleu profond.", ambiance: "Onirique, crépusculaire, éthérée." },
 
   { slug: "tattoo-family", title: "Tattoo Family", type: "Vidéo — Documentaire", cat: "video", images: 1, shapes: "v", vimeo: ["1208771663", "1208771666"],
@@ -39,7 +39,7 @@ window.PROJECTS = [
   { slug: "igor", duo: true, title: "Igor", type: "Direction artistique — Covers musicales", cat: "graphisme", images: 12, shapes: "vvvvvvvvvvvv",
     desc: "Pochettes pour l'univers éclectique d'Igor. Ciels de nuit, pluie numérique et silhouettes travaillées.", ambiance: "Nocturne, urbaine, cinématographique." },
 
-  { slug: "anti", title: "Anti × Keutchi", type: "Vidéo — Publicité", cat: "video", images: 7, shapes: "hhhhvvv", vimeo: ["1208774916"],
+  { slug: "anti", title: "Anti × Keutchi", type: "Vidéo — Publicité", cat: "video", images: 7, shapes: "hhhhvvv", bunny: ["710241/65b6319b-0d9e-4b7d-bcf8-dd02e0d695b2"],
     desc: "La marque Anti collabore avec l'artiste Keutchi pour sa collection de pièces Levi's vintage. Film de présentation tourné dans une caravane abandonnée et dans les vignes sous un ciel orageux.", ambiance: "Brute, orageuse." },
 
   { slug: "snaptrox", title: "Snaptrox", type: "Photographie — Automobile & lifestyle", cat: "photographie", images: 3, shapes: "hvv",
@@ -48,7 +48,7 @@ window.PROJECTS = [
   { slug: "cap-metiers", title: "Cap Métiers", type: "Motion design", cat: "motion", images: 0, vimeo: ["1208776567"],
     desc: "Mix de séquences motion design réalisées pour Cap Métiers Nouvelle-Aquitaine.", ambiance: "Corporate, animé, institutionnel." },
 
-  { slug: "web", duo: true, duoPair: [1, 3], title: "Web", type: "Photographie — Éditorial nocturne", cat: "photographie", images: 5, shapes: "vvvvh", vimeo: ["1208776061"],
+  { slug: "web", duo: true, duoPair: [1, 3], title: "Web", type: "Photographie — Éditorial nocturne", cat: "photographie", images: 5, shapes: "vvvvh", bunny: ["710241/f4246b77-aaf4-49b9-b935-d7d302b0fd02"],
     desc: "Série de groupe en nocturne, flash direct et voiture. Esthétique « crew » très années 2000.", ambiance: "Nocturne, urbaine, collective." },
 
   { slug: "dopamoon", title: "Dopamoon — Dopalova", type: "Vidéo — Clip musical", cat: "video", images: 0, vimeo: ["1208775751"],
