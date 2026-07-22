@@ -75,15 +75,21 @@
     a.href = `projet.html?id=${p.slug}`;
     a.dataset.category = p.cat;
     const isVid = p.cat === "video" || p.cat === "motion";
-    const vimeoId = isVid && p.vimeo && p.vimeo[0];
-    const ytId = isVid && !vimeoId && p.yt && p.yt[0];
-    const isVideo = !!(vimeoId || ytId);
+    const bunnyId = isVid && p.bunny && p.bunny[0];
+    const vimeoId = isVid && !bunnyId && p.vimeo && p.vimeo[0];
+    const ytId = isVid && !bunnyId && !vimeoId && p.yt && p.yt[0];
+    const isVideo = !!(bunnyId || vimeoId || ytId);
     const cov = cover(p);
     const num = String(i + 1).padStart(2, "0");
     const imgTag = (src) => `<img class="work__img" src="${src}" alt="${esc(p.title)} — ${esc(p.type)}" loading="lazy" />`;
 
     let mediaHtml;
-    if (p.duo && isVideo && p.vimeo && p.vimeo.length >= 2) {
+    if (p.duo && isVideo && p.bunny && p.bunny.length >= 2) {
+      // deux vidéos verticales côte à côte
+      const cells = p.bunny.slice(0, 2).map((id) =>
+        `<div class="work__cell work__vid is-bunny" data-bunny="${id}"><span class="work__ph"></span></div>`).join("");
+      mediaHtml = `<div class="work__media work__media--duo is-video">${cells}</div>`;
+    } else if (p.duo && isVideo && p.vimeo && p.vimeo.length >= 2) {
       // deux vidéos verticales côte à côte
       const cells = p.vimeo.slice(0, 2).map((id) =>
         `<div class="work__cell work__vid is-vimeo" data-vimeo="${id}"><span class="work__ph"></span></div>`).join("");
@@ -95,9 +101,10 @@
         `<div class="work__cell">${imgTag(`assets/projets/${p.slug}/${String(n).padStart(2,"0")}.webp`)}</div>`).join("");
       mediaHtml = `<div class="work__media work__media--duo">${cells}</div>`;
     } else if (isVideo) {
-      const attr = vimeoId ? `data-vimeo="${vimeoId}"` : `data-yt="${ytId}"`;
+      const attr = bunnyId ? `data-bunny="${bunnyId}"` : (vimeoId ? `data-vimeo="${vimeoId}"` : `data-yt="${ytId}"`);
+      const cls = bunnyId ? " is-bunny" : (vimeoId ? " is-vimeo" : "");
       const inner = cov ? imgTag(cov) : `<span class="work__ph"></span>`;
-      mediaHtml = `<div class="work__media work__vid is-video${vimeoId ? " is-vimeo" : ""}" ${attr}>${inner}</div>`;
+      mediaHtml = `<div class="work__media work__vid is-video${cls}" ${attr}>${inner}</div>`;
     } else {
       mediaHtml = `<div class="work__media">${cov ? imgTag(cov) : `<span class="work__ph"></span>`}</div>`;
     }
@@ -126,10 +133,13 @@
         const host = e.target;
         if (e.isIntersecting) {
           if (!host.querySelector("iframe")) {
-            const vimeo = host.dataset.vimeo, yt = host.dataset.yt;
+            const bunny = host.dataset.bunny, vimeo = host.dataset.vimeo, yt = host.dataset.yt;
             const f = document.createElement("iframe");
             f.className = "work__video";
-            if (vimeo) {
+            if (bunny) {
+              f.src = `https://player.mediadelivery.net/embed/${window.BUNNY_LIBRARY}/${bunny}?autoplay=true&loop=true&muted=true&preload=true&responsive=false`;
+              f.setAttribute("allow", "accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen;");
+            } else if (vimeo) {
               f.src = `https://player.vimeo.com/video/${vimeo}?background=1&autoplay=1&muted=1&loop=1&autopause=0&dnt=1`;
               f.setAttribute("allow", "autoplay; picture-in-picture");
             } else {

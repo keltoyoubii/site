@@ -2,9 +2,13 @@
    Projets Maëldan — données
    cat    : "video" | "motion" | "graphisme" | "photographie"  (filtre)
    images : nombre de .webp dans assets/projets/<slug>/ (01..N) — 0 si aucun
+   bunny  : guids Bunny Stream (fond auto muet dans la liste + lecteur complet en page projet)
+            — prioritaire sur vimeo/yt quand présent
    vimeo  : ids Vimeo (fond auto muet dans la liste + lecteur complet en page projet)
    yt     : ids YouTube (façade cliquable en page projet)
    ========================================================================= */
+
+window.BUNNY_LIBRARY = "710241";
 
 window.PROJECTS = [
   { slug: "reflet", title: "Reflet", type: "Vidéo — Contenu produit", cat: "video", images: 3, shapes: "vvh", cover: "assets/projets/reflet/03.webp", vimeo: ["1208777629"],
@@ -68,7 +72,7 @@ window.PROJECTS = [
   { slug: "luxie", title: "Luxie", type: "Photographie — Cover", cat: "photographie", images: 4, shapes: "hvhv",
     desc: "Série intimiste pour l'artiste Luxie.", ambiance: "Intime, rêveuse, musicale." },
 
-  { slug: "amaury", duo: true, title: "Amaury × Amë Lorette", type: "Vidéo — Publicité", cat: "video", images: 0, vimeo: ["1208778430", "1208778431"],
+  { slug: "amaury", duo: true, title: "Amaury × Amë Lorette", type: "Vidéo — Publicité", cat: "video", images: 0, bunny: ["bfe2c956-f084-4534-ac69-a5707e745245", "74000df8-a389-4de0-97d3-8999ac9f05b3"],
     desc: "Campagne social pour la marque de lunettes Amaury Paris, en collaboration avec l'artiste Amë Lorette.", ambiance: "Mixed media, coloré, éditorial." },
 
   { slug: "nowhere-drive", title: "Nowhere Drive", type: "Photographie — Série narrative", cat: "photographie", images: 10, shapes: "hhhhvvhhhh",
