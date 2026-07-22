@@ -14,7 +14,7 @@ window.PROJECTS = [
   { slug: "nina-plage", title: "Nina — Plage", type: "Photographie — Éditorial mode & beauté", cat: "photographie", images: 9, shapes: "hhhhhvvhh", bunny: ["710241/2c3556ec-2a3f-4c6a-b28c-aded8c956c57"],
     desc: "Éditorial de plage au crépuscule avec la mannequin Nina Albaut : robe blanche fluide, vent et embruns sur fond bleu profond.", ambiance: "Onirique, crépusculaire, éthérée." },
 
-  { slug: "tattoo-family", title: "Tattoo Family", type: "Vidéo — Documentaire", cat: "video", images: 1, shapes: "v", vimeo: ["1208771663", "1208771666"],
+  { slug: "tattoo-family", title: "Tattoo Family", type: "Vidéo — Documentaire", cat: "video", images: 1, shapes: "v", bunny: ["710241/930aafd0-6afd-4306-ab1d-a314ce32e40c", "710241/5b0a2488-bbd1-4519-9eaa-fa181b32a900"],
     yt: ["xdJYTv6CLsg","SrHeiPzpi4M","BkD-wSJecWo"],
     desc: "Documentaire sur un salon de tatouage et ses artistes : scènes de travail, ambiance chaleureuse et tamisée.", ambiance: "Documentaire, chaleureuse, authentique." },
 
