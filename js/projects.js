@@ -11,7 +11,7 @@
 window.BUNNY_LIBRARY = "710241";
 
 window.PROJECTS = [
-  { slug: "reflet", title: "Reflet", type: "Vidéo — Contenu produit", cat: "video", images: 3, shapes: "vvh", cover: "assets/projets/reflet/03.webp", vimeo: ["1208777629"],
+  { slug: "reflet", title: "Reflet", type: "Vidéo — Contenu produit", cat: "video", images: 3, shapes: "vvh", cover: "assets/projets/reflet/03.webp", bunny: ["0c9043ce-79ac-452c-a5b4-0df20088ed37", "8266ebff-b673-4385-afb4-547241b02b84"],
     yt: ["_9e64kzqg_A","OPZN22Yxz18","11Gz2rNdVq4","Ts5ZgpUMHRw","C_J5y-JWzjM","W5rxqsUMRnI","10YRNQS3wQ8","QzQOIpLrpt8"],
     desc: "Contenus pour la marque de soin Reflet : packshots de flacons, textures et unboxing. Éclairage studio net et moderne.", ambiance: "Commerciale, moderne, épurée." },
 
