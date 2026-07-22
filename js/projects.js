@@ -45,7 +45,7 @@ window.PROJECTS = [
   { slug: "snaptrox", title: "Snaptrox", type: "Photographie — Automobile & lifestyle", cat: "photographie", images: 3, shapes: "hvv",
     desc: "Photoshoot autour de la Porsche 944 du youtubeur Snaptrox : toit urbain, skyline et portrait au coucher de soleil.", ambiance: "Automobile, urbaine, youngtimer." },
 
-  { slug: "cap-metiers", title: "Cap Métiers", type: "Motion design", cat: "motion", images: 0, vimeo: ["1208776567"],
+  { slug: "cap-metiers", title: "Cap Métiers", type: "Motion design", cat: "motion", images: 0, bunny: ["710241/073baab8-0fd9-4398-935b-4e9f2630573a"],
     desc: "Mix de séquences motion design réalisées pour Cap Métiers Nouvelle-Aquitaine.", ambiance: "Corporate, animé, institutionnel." },
 
   { slug: "web", duo: true, duoPair: [1, 3], title: "Web", type: "Photographie — Éditorial nocturne", cat: "photographie", images: 5, shapes: "vvvvh", bunny: ["710241/f4246b77-aaf4-49b9-b935-d7d302b0fd02"],
