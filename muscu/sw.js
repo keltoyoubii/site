@@ -1,7 +1,7 @@
 // Service worker : cache l'app shell pour un fonctionnement hors-ligne
 // (utile à la salle, réseau souvent capricieux).
 
-const CACHE = "muscu-v2";
+const CACHE = "muscu-v3";
 const ASSETS = [
   "./",
   "./index.html",
