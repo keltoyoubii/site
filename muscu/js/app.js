@@ -1,4 +1,4 @@
-import { Store, SEED_PROGRAM } from "./storage.js";
+import { Store, SEED_PROGRAMS } from "./storage.js";
 import { RestTimer, playBeep, vibrate, formatTime, requestWakeLock, releaseWakeLock } from "./timer.js";
 import { lineChart, barChart } from "./charts.js";
 
@@ -106,6 +106,7 @@ const VIEWS = {
   historique: viewHistory,
   exercice: viewExerciseProgress,
   reglages: viewSettings,
+  modeles: viewPresets,
 };
 
 /* --------- Home --------- */
@@ -147,12 +148,8 @@ function viewHome() {
         el("button", {
           class: "btn btn--ghost btn--sm",
           style: "margin-top:10px;",
-          onclick: () => {
-            Store.saveProgram({ ...SEED_PROGRAM, id: Store.uid() });
-            toast("Programme d'exemple ajouté");
-            render();
-          },
-        }, "Ou charger un programme d'exemple"),
+          onclick: () => navigate("/modeles"),
+        }, "Ou charger un modèle (Full Body, Push/Pull/Legs...)"),
       ])
     );
   } else {
@@ -174,9 +171,41 @@ function viewHome() {
 
   if (programs.length > 0) {
     view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/programme/new") }, "+ Nouveau programme"));
+    view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/modeles") }, "📋 Modèles (Full Body, Push/Pull/Legs...)"));
   }
 
   view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/historique") }, "📈 Historique & progression"));
+
+  return view;
+}
+
+/* --------- Modèles / presets --------- */
+
+function viewPresets() {
+  const view = el("div", { class: "view" });
+  view.appendChild(topbar({ title: "Modèles de programme", subtitle: "Ajoute-les tels quels, puis modifie-les à ta guise.", back: () => navigate("/") }));
+
+  const list = el("div", { class: "stack" });
+  SEED_PROGRAMS.forEach((preset) => {
+    const nSets = preset.exercises.reduce((s, e) => s + e.targetSets, 0);
+    list.appendChild(
+      el("div", { class: "card program-card" }, [
+        el("div", { class: "program-card__name" }, preset.name),
+        el("div", { class: "program-card__meta" }, `${preset.exercises.length} exercices · ${nSets} séries · ${preset.exercises.map((e) => e.name).join(", ")}`),
+        el("div", { class: "program-card__actions" }, [
+          el("button", {
+            class: "btn btn--primary",
+            onclick: () => {
+              Store.saveProgram({ ...preset, id: Store.uid(), exercises: preset.exercises.map((e) => ({ ...e, id: Store.uid() })) });
+              toast(`« ${preset.name} » ajouté à tes programmes`);
+              navigate("/");
+            },
+          }, "+ Ajouter à mes programmes"),
+        ]),
+      ])
+    );
+  });
+  view.appendChild(list);
 
   return view;
 }
