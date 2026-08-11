@@ -1,6 +1,7 @@
-import { Store, SEED_PROGRAMS } from "./storage.js";
+import { Store, SEED_PROGRAMS, localDateKey } from "./storage.js";
 import { RestTimer, playBeep, vibrate, formatTime, requestWakeLock, releaseWakeLock } from "./timer.js";
 import { lineChart, barChart } from "./charts.js";
+import { MUSCLES, muscleBadge, inferMuscle } from "./muscles.js";
 
 const root = document.getElementById("app");
 
@@ -92,7 +93,14 @@ function topbar({ title, subtitle, back, right }) {
 
 /* ============================== Views ============================== */
 
+let activeTimers = [];
+function stopActiveTimers() {
+  activeTimers.forEach((t) => t.stop());
+  activeTimers = [];
+}
+
 function render() {
+  stopActiveTimers();
   const { name, params } = parseHash();
   root.innerHTML = "";
   const view = VIEWS[name] || VIEWS.home;
@@ -100,7 +108,8 @@ function render() {
 }
 
 const VIEWS = {
-  home: viewHome,
+  home: viewDashboard,
+  programmes: viewProgramsList,
   programme: viewProgramEditor,
   seance: viewSession,
   historique: viewHistory,
@@ -109,14 +118,48 @@ const VIEWS = {
   modeles: viewPresets,
 };
 
-/* --------- Home --------- */
+function uniqueMuscles(exercises) {
+  return [...new Set(exercises.map((e) => e.muscle).filter(Boolean))];
+}
 
-function viewHome() {
+/* --------- Dashboard (accueil) --------- */
+
+function startOfWeek(date) {
+  const d = new Date(date);
+  const offset = (d.getDay() + 6) % 7; // lundi = 0
+  d.setDate(d.getDate() - offset);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function isSameWeek(a, b) {
+  return startOfWeek(a).getTime() === startOfWeek(b).getTime();
+}
+
+function sessionVolume(s) {
+  return s.exercises.reduce((sum, e) => sum + e.sets.reduce((s2, set) => s2 + set.weight * set.reps, 0), 0);
+}
+
+function computeWeeklyVolume(history, weeksCount) {
+  const weeks = [];
+  for (let i = weeksCount - 1; i >= 0; i--) {
+    weeks.push(startOfWeek(new Date(Date.now() - i * 7 * 86400000)));
+  }
+  return weeks.map((weekStart) => {
+    const weekEnd = new Date(weekStart.getTime() + 7 * 86400000);
+    const vol = history
+      .filter((s) => { const d = new Date(s.startedAt); return d >= weekStart && d < weekEnd; })
+      .reduce((sum, s) => sum + sessionVolume(s), 0);
+    return { x: weekStart, y: Math.round(vol), label: weekStart.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }) };
+  });
+}
+
+function viewDashboard() {
   const view = el("div", { class: "view" });
   view.appendChild(
     topbar({
       title: "Muscu",
-      subtitle: "Tes séances, tes charges, ton rythme.",
+      subtitle: "Ton tableau de bord.",
       right: el("button", { class: "icon-btn", onclick: () => navigate("/reglages") }, "⚙"),
     })
   );
@@ -135,6 +178,179 @@ function viewHome() {
     );
   }
 
+  /* ---- Calendrier : clique un jour pour choisir / démarrer une séance ---- */
+
+  const viewedDate = new Date();
+  viewedDate.setDate(1);
+  let selectedKey = localDateKey(new Date());
+
+  const navRow = el("div", { class: "cal-nav" });
+  const monthLabel = el("div", { class: "cal-nav__label" });
+  const prevBtn = el("button", { class: "icon-btn", type: "button", "aria-label": "Mois précédent" }, "‹");
+  const nextBtn = el("button", { class: "icon-btn", type: "button", "aria-label": "Mois suivant" }, "›");
+  navRow.appendChild(prevBtn);
+  navRow.appendChild(monthLabel);
+  navRow.appendChild(nextBtn);
+
+  const grid = el("div", { class: "cal-grid" });
+  const calCard = el("div", { class: "card stack" }, [
+    navRow,
+    el("div", { class: "cal-weekdays" }, ["L", "M", "M", "J", "V", "S", "D"].map((d) => el("span", {}, d))),
+    grid,
+  ]);
+  view.appendChild(calCard);
+
+  const panelWrap = el("div", { class: "day-panel" });
+  view.appendChild(panelWrap);
+
+  function redrawGrid() {
+    monthLabel.textContent = viewedDate.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+    grid.innerHTML = "";
+    const year = viewedDate.getFullYear();
+    const month = viewedDate.getMonth();
+    const firstOfMonth = new Date(year, month, 1);
+    const offset = (firstOfMonth.getDay() + 6) % 7; // lundi = 0
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const todayKey = localDateKey(new Date());
+    const schedule = Store.getSchedule();
+
+    for (let i = 0; i < offset; i++) {
+      grid.appendChild(el("button", { class: "cal-cell", type: "button", disabled: "true" }, ""));
+    }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const key = localDateKey(new Date(year, month, day));
+      const hasSession = Store.sessionsOnDate(key).length > 0;
+      const hasPlan = !!schedule[key];
+      grid.appendChild(
+        el("button", {
+          class: `cal-cell${key === todayKey ? " is-today" : ""}${key === selectedKey ? " is-selected" : ""}`,
+          type: "button",
+          onclick: () => { selectedKey = key; redrawGrid(); redrawPanel(); },
+        }, [
+          el("span", {}, String(day)),
+          el("span", { class: `cal-cell__dot${hasSession ? " is-done" : hasPlan ? " is-planned" : ""}` }),
+        ])
+      );
+    }
+  }
+
+  function redrawPanel() {
+    panelWrap.innerHTML = "";
+    const d = new Date(`${selectedKey}T00:00:00`);
+    const isToday = selectedKey === localDateKey(new Date());
+    panelWrap.appendChild(el("div", { class: "day-panel__title" }, d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })));
+
+    const sessions = Store.sessionsOnDate(selectedKey);
+    if (sessions.length > 0) {
+      sessions.forEach((s) => {
+        const volume = sessionVolume(s);
+        const nSets = s.exercises.reduce((sum, e) => sum + e.sets.length, 0);
+        panelWrap.appendChild(
+          el("div", { class: "card session-item" }, [
+            el("div", { class: "session-item__name" }, `✓ ${s.programName}`),
+            el("div", { class: "session-item__stats" }, [
+              el("span", {}, `${nSets} séries`),
+              el("span", {}, `${Math.round(volume).toLocaleString("fr-FR")} kg volume`),
+            ]),
+            el("div", { class: "stack", style: "gap:6px; margin-top:8px;" }, s.exercises.map((e) =>
+              el("div", { class: "exercise-row-inline" }, [
+                muscleBadge(e.muscle, "sm"),
+                el("div", { class: "program-card__meta" }, `${e.name} — ${e.sets.map((st) => `${st.weight}kg×${st.reps}`).join(", ")}`),
+              ])
+            )),
+          ])
+        );
+      });
+      return;
+    }
+
+    const schedule = Store.getSchedule();
+    const plannedProgram = schedule[selectedKey] ? Store.getProgram(schedule[selectedKey]) : null;
+
+    if (plannedProgram) {
+      panelWrap.appendChild(
+        el("div", { class: "card program-card" }, [
+          el("div", { class: "text-dim" }, "Programme prévu"),
+          el("div", { class: "program-card__name" }, plannedProgram.name),
+          !isToday ? el("div", { class: "text-dim", style: "font-size:.78rem;" }, "La séance sera enregistrée à la date d'aujourd'hui.") : null,
+          el("div", { class: "program-card__actions" }, [
+            el("button", { class: "btn btn--primary", onclick: () => startSession(plannedProgram.id) }, "▶ Commencer maintenant"),
+            el("button", { class: "btn btn--ghost btn--sm", onclick: () => { Store.clearScheduledProgram(selectedKey); redrawGrid(); redrawPanel(); } }, "Retirer"),
+          ]),
+        ])
+      );
+      return;
+    }
+
+    const programs = Store.getPrograms();
+    if (programs.length === 0) {
+      panelWrap.appendChild(
+        el("div", { class: "empty" }, [
+          el("div", {}, "Crée d'abord un programme pour pouvoir choisir ta séance."),
+          el("button", { class: "btn btn--primary btn--sm", style: "margin-top:12px;", onclick: () => navigate("/programme/new") }, "+ Créer un programme"),
+        ])
+      );
+      return;
+    }
+    panelWrap.appendChild(el("div", { class: "text-dim" }, "Quel programme ce jour-là ?"));
+    const picker = el("div", { class: "chip-group" });
+    programs.forEach((p) => {
+      picker.appendChild(
+        el("button", { class: "chip", type: "button", onclick: () => { Store.setScheduledProgram(selectedKey, p.id); redrawGrid(); redrawPanel(); } }, p.name)
+      );
+    });
+    panelWrap.appendChild(picker);
+  }
+
+  prevBtn.addEventListener("click", () => { viewedDate.setMonth(viewedDate.getMonth() - 1); redrawGrid(); });
+  nextBtn.addEventListener("click", () => { viewedDate.setMonth(viewedDate.getMonth() + 1); redrawGrid(); });
+
+  redrawGrid();
+  redrawPanel();
+
+  /* ---- Progression générale ---- */
+
+  const history = Store.getHistory();
+  if (history.length > 0) {
+    view.appendChild(el("div", { class: "section-title" }, "Progression générale"));
+
+    const now = new Date();
+    const volume30 = history
+      .filter((s) => Date.now() - new Date(s.startedAt).getTime() <= 30 * 86400000)
+      .reduce((sum, s) => sum + sessionVolume(s), 0);
+    const weekCount = history.filter((s) => isSameWeek(new Date(s.startedAt), now)).length;
+
+    view.appendChild(
+      el("div", { class: "summary-grid" }, [
+        el("div", { class: "summary-stat" }, [el("span", { class: "n" }, String(history.length)), el("span", { class: "l" }, "séances au total")]),
+        el("div", { class: "summary-stat" }, [el("span", { class: "n" }, String(weekCount)), el("span", { class: "l" }, "cette semaine")]),
+        el("div", { class: "summary-stat" }, [el("span", { class: "n" }, Math.round(volume30).toLocaleString("fr-FR")), el("span", { class: "l" }, "kg (30 j.)")]),
+      ])
+    );
+
+    view.appendChild(
+      el("div", { class: "card stack" }, [
+        el("div", { class: "text-dim" }, "Volume par semaine"),
+        barChart(computeWeeklyVolume(history, 8), { unit: " kg" }),
+      ])
+    );
+
+    view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/historique") }, "Voir tout l'historique →"));
+  } else {
+    view.appendChild(el("div", { class: "empty" }, "Ta progression apparaîtra ici après ta première séance."));
+  }
+
+  view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/programmes") }, "🗂 Mes programmes"));
+
+  return view;
+}
+
+/* --------- Mes programmes --------- */
+
+function viewProgramsList() {
+  const view = el("div", { class: "view" });
+  view.appendChild(topbar({ title: "Mes programmes", back: () => navigate("/") }));
+
   const programs = Store.getPrograms();
   const list = el("div", { class: "stack" });
 
@@ -145,22 +361,20 @@ function viewHome() {
         el("div", { class: "row", style: "justify-content:center; margin-top:14px; gap:10px;" }, [
           el("button", { class: "btn btn--primary", onclick: () => navigate("/programme/new") }, "+ Créer un programme"),
         ]),
-        el("button", {
-          class: "btn btn--ghost btn--sm",
-          style: "margin-top:10px;",
-          onclick: () => navigate("/modeles"),
-        }, "Ou charger un modèle (Full Body, Push/Pull/Legs...)"),
+        el("button", { class: "btn btn--ghost btn--sm", style: "margin-top:10px;", onclick: () => navigate("/modeles") }, "Ou charger un modèle"),
       ])
     );
   } else {
     programs.forEach((p) => {
       const nSets = p.exercises.reduce((s, e) => s + e.targetSets, 0);
+      const badgeRow = el("div", { class: "muscle-badge-row" });
+      uniqueMuscles(p.exercises).forEach((m) => badgeRow.appendChild(muscleBadge(m, "sm")));
       list.appendChild(
         el("div", { class: "card program-card" }, [
           el("div", { class: "program-card__name" }, p.name),
           el("div", { class: "program-card__meta" }, `${p.exercises.length} exercices · ${nSets} séries au total`),
+          badgeRow.children.length ? badgeRow : null,
           el("div", { class: "program-card__actions" }, [
-            el("button", { class: "btn btn--primary", onclick: () => startSession(p.id) }, "▶ Commencer"),
             el("button", { class: "btn btn--ghost btn--sm", onclick: () => navigate(`/programme/${p.id}`) }, "Modifier"),
           ]),
         ])
@@ -168,13 +382,8 @@ function viewHome() {
     });
   }
   view.appendChild(list);
-
-  if (programs.length > 0) {
-    view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/programme/new") }, "+ Nouveau programme"));
-    view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/modeles") }, "📋 Modèles (Full Body, Push/Pull/Legs...)"));
-  }
-
-  view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/historique") }, "📈 Historique & progression"));
+  view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/programme/new") }, "+ Nouveau programme"));
+  view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/modeles") }, "📋 Modèles (Full Body, Push/Pull/Legs...)"));
 
   return view;
 }
@@ -183,22 +392,25 @@ function viewHome() {
 
 function viewPresets() {
   const view = el("div", { class: "view" });
-  view.appendChild(topbar({ title: "Modèles de programme", subtitle: "Ajoute-les tels quels, puis modifie-les à ta guise.", back: () => navigate("/") }));
+  view.appendChild(topbar({ title: "Modèles de programme", subtitle: "Ajoute-les tels quels, puis modifie-les à ta guise.", back: () => navigate("/programmes") }));
 
   const list = el("div", { class: "stack" });
   SEED_PROGRAMS.forEach((preset) => {
     const nSets = preset.exercises.reduce((s, e) => s + e.targetSets, 0);
+    const badgeRow = el("div", { class: "muscle-badge-row" });
+    uniqueMuscles(preset.exercises).forEach((m) => badgeRow.appendChild(muscleBadge(m, "sm")));
     list.appendChild(
       el("div", { class: "card program-card" }, [
         el("div", { class: "program-card__name" }, preset.name),
         el("div", { class: "program-card__meta" }, `${preset.exercises.length} exercices · ${nSets} séries · ${preset.exercises.map((e) => e.name).join(", ")}`),
+        badgeRow,
         el("div", { class: "program-card__actions" }, [
           el("button", {
             class: "btn btn--primary",
             onclick: () => {
               Store.saveProgram({ ...preset, id: Store.uid(), exercises: preset.exercises.map((e) => ({ ...e, id: Store.uid() })) });
               toast(`« ${preset.name} » ajouté à tes programmes`);
-              navigate("/");
+              navigate("/programmes");
             },
           }, "+ Ajouter à mes programmes"),
         ]),
@@ -222,7 +434,7 @@ function startSession(programId) {
 /* --------- Program editor --------- */
 
 function blankExercise() {
-  return { id: Store.uid(), name: "", targetSets: 3, targetReps: "10", restSeconds: 90, note: "" };
+  return { id: Store.uid(), name: "", targetSets: 3, targetReps: "10", restSeconds: 90, note: "", muscle: null };
 }
 
 function viewProgramEditor(id) {
@@ -232,7 +444,7 @@ function viewProgramEditor(id) {
     : structuredClone(Store.getProgram(id) || { id: Store.uid(), name: "", exercises: [blankExercise()] });
 
   const view = el("div", { class: "view" });
-  view.appendChild(topbar({ title: isNew ? "Nouveau programme" : "Modifier le programme", back: () => navigate("/") }));
+  view.appendChild(topbar({ title: isNew ? "Nouveau programme" : "Modifier le programme", back: () => navigate("/programmes") }));
 
   const nameInput = el("input", { type: "text", placeholder: "Nom du programme (ex : Push / Pull / Legs)", value: program.name });
   view.appendChild(el("label", { class: "field" }, ["Nom", nameInput]));
@@ -247,7 +459,24 @@ function viewProgramEditor(id) {
 
   function exerciseRow(ex, i) {
     const row = el("div", { class: "exercise-row" });
-    const nameField = el("input", { type: "text", placeholder: `Exercice ${i + 1}`, value: ex.name, oninput: (e) => (ex.name = e.target.value) });
+    let muscleManuallySet = !!ex.muscle;
+    const badge = muscleBadge(ex.muscle, "md");
+    const nameField = el("input", {
+      type: "text",
+      placeholder: `Exercice ${i + 1}`,
+      value: ex.name,
+      oninput: (e) => {
+        ex.name = e.target.value;
+        if (!muscleManuallySet) {
+          ex.muscle = inferMuscle(ex.name);
+          const fresh = muscleBadge(ex.muscle, "md");
+          badge.innerHTML = fresh.innerHTML;
+          badge.className = fresh.className;
+          badge.title = fresh.title || "";
+          muscleChips.querySelectorAll(".chip").forEach((c, idx) => c.classList.toggle("is-active", MUSCLES[idx].key === ex.muscle));
+        }
+      },
+    });
 
     row.appendChild(
       el("div", { class: "exercise-row__head" }, [
@@ -255,10 +484,25 @@ function viewProgramEditor(id) {
           el("button", { class: "btn btn--sm btn--ghost", disabled: i === 0 ? "true" : null, onclick: () => { [program.exercises[i - 1], program.exercises[i]] = [program.exercises[i], program.exercises[i - 1]]; renumberAndRedraw(); } }, "↑"),
           el("button", { class: "btn btn--sm btn--ghost", disabled: i === program.exercises.length - 1 ? "true" : null, onclick: () => { [program.exercises[i + 1], program.exercises[i]] = [program.exercises[i], program.exercises[i + 1]]; renumberAndRedraw(); } }, "↓"),
         ]),
+        badge,
         nameField,
         el("button", { class: "icon-btn", "aria-label": "Supprimer", onclick: () => { program.exercises.splice(i, 1); renumberAndRedraw(); } }, "✕"),
       ])
     );
+
+    const muscleChips = el("div", { class: "chip-group" }, MUSCLES.map((m) =>
+      el("button", { class: `chip${ex.muscle === m.key ? " is-active" : ""}`, type: "button", onclick: (e) => {
+        ex.muscle = m.key;
+        muscleManuallySet = true;
+        const fresh = muscleBadge(ex.muscle, "md");
+        badge.innerHTML = fresh.innerHTML;
+        badge.className = fresh.className;
+        badge.title = fresh.title;
+        e.currentTarget.parentElement.querySelectorAll(".chip").forEach((c) => c.classList.remove("is-active"));
+        e.currentTarget.classList.add("is-active");
+      } }, m.label)
+    ));
+    row.appendChild(el("label", { class: "field" }, ["Muscle ciblé", muscleChips]));
 
     const setsInput = el("input", { type: "number", min: "1", value: ex.targetSets, oninput: (e) => (ex.targetSets = Math.max(1, parseInt(e.target.value) || 1)) });
     const repsInput = el("input", { type: "text", value: ex.targetReps, placeholder: "8-10", oninput: (e) => (ex.targetReps = e.target.value) });
@@ -307,7 +551,7 @@ function viewProgramEditor(id) {
         }
         Store.saveProgram(program);
         toast("Programme enregistré");
-        navigate("/");
+        navigate("/programmes");
       },
     }, "Enregistrer")
   );
@@ -316,7 +560,7 @@ function viewProgramEditor(id) {
       el("button", { class: "btn btn--danger btn--block", onclick: () => {
         if (confirm("Supprimer ce programme ?")) {
           Store.deleteProgram(program.id);
-          navigate("/");
+          navigate("/programmes");
         }
       } }, "Supprimer le programme")
     );
@@ -333,9 +577,21 @@ function formatRest(seconds) {
   return s ? `${m}m${String(s).padStart(2, "0")}` : `${m} min`;
 }
 
-/* --------- Session runner --------- */
+/* --------- Session runner : toutes les cartes sur une seule page --------- */
 
-let sessionTimer = null;
+function parsePrimaryReps(target) {
+  const match = String(target).match(/\d+/);
+  return match ? parseInt(match[0]) : 10;
+}
+function roundTo(v, step) {
+  return Math.round(v / step) * step;
+}
+
+function newExerciseState() {
+  // phase: "idle" | "armed" | "resting" — persisté pour survivre à un rendu
+  // global déclenché par une AUTRE carte (ex. fin du repos d'un autre exercice).
+  return { setIndex: 0, phase: "idle", armedWeight: null, armedReps: null, restEndsAt: null, restDurationMs: null, restConsumed: false };
+}
 
 function viewSession(programId) {
   const program = Store.getProgram(programId);
@@ -352,266 +608,211 @@ function viewSession(programId) {
     session = {
       programId,
       startedAt: new Date().toISOString(),
-      exerciseIndex: 0,
-      setIndex: 0,
-      phase: "work", // "work" | "rest"
-      restEndsAt: null,
-      restDurationMs: null,
-      restConsumed: false,
-      log: program.exercises.map((ex) => ({ exerciseId: ex.id, name: ex.name, restSeconds: ex.restSeconds, sets: [] })),
+      finished: false,
+      log: program.exercises.map((ex) => ({ exerciseId: ex.id, name: ex.name, muscle: ex.muscle || null, restSeconds: ex.restSeconds, sets: [] })),
+      exerciseState: program.exercises.map(() => newExerciseState()),
     };
     Store.setActive(session);
-    requestWakeLock();
-  } else {
-    requestWakeLock();
   }
+  if (!session.exerciseState) {
+    // reprise d'une séance créée avant ce format (ancien flux séquentiel)
+    session.exerciseState = program.exercises.map(() => newExerciseState());
+    session.finished = false;
+    Store.setActive(session);
+  }
+  requestWakeLock();
 
-  if (session.exerciseIndex >= program.exercises.length) {
+  if (session.finished) {
     return renderSummary(program, session);
   }
 
-  const exercise = program.exercises[session.exerciseIndex];
-  const exLog = session.log[session.exerciseIndex];
+  const totalSets = program.exercises.reduce((s, e) => s + e.targetSets, 0);
+  const doneSets = session.log.reduce((s, e) => s + e.sets.length, 0);
+  const allDone = session.exerciseState.every((st, i) => st.setIndex >= program.exercises[i].targetSets);
 
   view.appendChild(
     topbar({
       title: program.name,
-      subtitle: `Exercice ${session.exerciseIndex + 1} / ${program.exercises.length}`,
+      subtitle: `${doneSets} / ${totalSets} séries`,
       back: () => {
         if (confirm("Quitter la séance ? Ta progression reste enregistrée, tu pourras reprendre.")) {
           releaseWakeLock();
           navigate("/");
         }
       },
-      right: el("button", { class: "icon-btn", "aria-label": "Terminer", onclick: () => endSessionEarly(program, session) }, "⏹"),
     })
   );
 
-  if (session.phase === "rest") {
-    view.appendChild(renderRest(program, session, exercise, exLog));
-  } else {
-    view.appendChild(renderWork(program, session, exercise, exLog));
-  }
+  const list = el("div", { class: "stack" });
+  program.exercises.forEach((exercise, i) => list.appendChild(renderExerciseCard(program, session, exercise, i)));
+  view.appendChild(list);
+
+  view.appendChild(
+    el("button", {
+      class: `btn btn--block btn--lg ${allDone ? "btn--primary" : "btn--ghost"}`,
+      onclick: () => finishSession(program, session, allDone),
+    }, allDone ? "🏁 Voir le résumé" : "Terminer la séance maintenant")
+  );
 
   return view;
 }
 
-function renderWork(program, session, exercise, exLog) {
-  const wrap = el("div", { class: "stack" });
+function renderExerciseCard(program, session, exercise, index) {
+  const state = session.exerciseState[index];
+  const exLog = session.log[index];
+  const isDone = state.setIndex >= exercise.targetSets;
 
-  wrap.appendChild(el("div", { class: "exercise-title" }, exercise.name));
-  wrap.appendChild(el("div", { class: "exercise-target" }, `${exercise.targetSets} séries × ${exercise.targetReps} reps · repos ${formatRest(exercise.restSeconds)}`));
+  const card = el("div", { class: `card ex-card${isDone ? " is-complete" : ""}` });
+
+  card.appendChild(
+    el("div", { class: "ex-card__head" }, [
+      muscleBadge(exercise.muscle, "md"),
+      el("div", { class: "stack", style: "gap:2px; flex:1;" }, [
+        el("div", { class: "ex-card__name" }, exercise.name),
+        el("div", { class: "ex-card__meta" }, `${exercise.targetSets} × ${exercise.targetReps} · repos ${formatRest(exercise.restSeconds)}`),
+      ]),
+      isDone ? el("span", { class: "ex-card__check" }, "✓") : null,
+    ])
+  );
 
   const dots = el("div", { class: "set-dots" });
-  for (let i = 0; i < exercise.targetSets; i++) {
-    dots.appendChild(el("span", { class: `set-dot${i < session.setIndex ? " is-done" : ""}${i === session.setIndex ? " is-current" : ""}` }));
+  for (let s = 0; s < exercise.targetSets; s++) {
+    dots.appendChild(el("span", { class: `set-dot${s < state.setIndex ? " is-done" : ""}${s === state.setIndex && !isDone ? " is-current" : ""}` }));
   }
-  wrap.appendChild(dots);
-  wrap.appendChild(el("div", { class: "session-progress" }, `Série ${session.setIndex + 1} / ${exercise.targetSets}`));
+  card.appendChild(dots);
+
+  if (isDone) {
+    card.appendChild(
+      el("div", { class: "text-dim text-center", style: "font-size:.85rem;" }, exLog.sets.map((s) => `${s.weight}kg×${s.reps}`).join(" · "))
+    );
+    return card;
+  }
 
   const lastWeight = Store.lastWeightFor(exercise.name);
-  const prevSetThisSession = exLog.sets[session.setIndex - 1];
-  const suggestedWeight = prevSetThisSession ? prevSetThisSession.weight : lastWeight ?? 20;
-
-  let weight = suggestedWeight;
-  let reps = parsePrimaryReps(exercise.targetReps);
+  const prevSetThisSession = exLog.sets[state.setIndex - 1];
+  const isArmed = state.phase === "armed";
+  let weight = isArmed && state.armedWeight != null ? state.armedWeight : prevSetThisSession ? prevSetThisSession.weight : lastWeight ?? 20;
+  let reps = isArmed && state.armedReps != null ? state.armedReps : parsePrimaryReps(exercise.targetReps);
 
   const weightValue = el("span", { class: "n" }, String(weight));
   const repsValue = el("span", { class: "n" }, String(reps));
 
-  const weightStepper = el("div", { class: "stepper" }, [
+  const weightStepper = el("div", { class: "stepper stepper--sm" }, [
     el("button", { class: "stepper__btn", type: "button", onclick: () => { weight = Math.max(0, roundTo(weight - 2.5, 2.5)); weightValue.textContent = weight; } }, "−"),
     el("div", { class: "stepper__value" }, [weightValue, el("span", { class: "u" }, "kg")]),
     el("button", { class: "stepper__btn", type: "button", onclick: () => { weight = roundTo(weight + 2.5, 2.5); weightValue.textContent = weight; } }, "+"),
   ]);
-  const repsStepper = el("div", { class: "stepper" }, [
+  const repsStepper = el("div", { class: "stepper stepper--sm" }, [
     el("button", { class: "stepper__btn", type: "button", onclick: () => { reps = Math.max(0, reps - 1); repsValue.textContent = reps; } }, "−"),
     el("div", { class: "stepper__value" }, [repsValue, el("span", { class: "u" }, "reps")]),
     el("button", { class: "stepper__btn", type: "button", onclick: () => { reps += 1; repsValue.textContent = reps; } }, "+"),
   ]);
-
-  wrap.appendChild(weightStepper);
-  wrap.appendChild(repsStepper);
+  const steppersRow = el("div", { class: "row", style: "gap:8px;" }, [weightStepper, repsStepper]);
+  card.appendChild(steppersRow);
 
   if (lastWeight !== null) {
-    wrap.appendChild(el("div", { class: "last-time" }, `Dernière fois sur cet exercice : ${lastWeight} kg`));
+    card.appendChild(el("div", { class: "last-time" }, `Dernière fois : ${lastWeight} kg`));
   }
 
-  wrap.appendChild(
-    el("button", {
-      class: "btn btn--primary btn--lg btn--block",
-      onclick: () => {
-        exLog.sets.push({ weight, reps, ts: new Date().toISOString() });
+  const actionSlot = el("div", {});
+  card.appendChild(actionSlot);
 
-        const isLastSet = session.setIndex >= exercise.targetSets - 1;
-        const isLastExercise = session.exerciseIndex >= program.exercises.length - 1;
+  function setSteppersDisabled(disabled) {
+    steppersRow.querySelectorAll("button").forEach((b) => (b.disabled = disabled));
+  }
 
-        if (isLastSet && isLastExercise) {
-          session.exerciseIndex += 1;
-          session.phase = "work";
-          session.setIndex = 0;
+  function renderGoButton() {
+    actionSlot.innerHTML = "";
+    setSteppersDisabled(false);
+    actionSlot.appendChild(
+      el("button", {
+        class: "btn btn--primary btn--lg btn--block",
+        onclick: () => {
+          state.phase = "armed";
+          state.armedWeight = weight;
+          state.armedReps = reps;
           Store.setActive(session);
-          render();
-          return;
-        }
-
-        session.phase = "rest";
-        session.restConsumed = false;
-        session.restDurationMs = exercise.restSeconds * 1000;
-        session.restEndsAt = Date.now() + session.restDurationMs;
-        Store.setActive(session);
-        render();
-      },
-    }, `✓ Valider la série ${session.setIndex + 1}`)
-  );
-
-  if (session.setIndex > 0 || exLog.sets.length > 0) {
-    wrap.appendChild(
-      el("button", { class: "btn btn--ghost btn--sm btn--block", onclick: () => nextExercise(program, session) }, "Passer à l'exercice suivant →")
+          setSteppersDisabled(true);
+          renderArmedButton();
+        },
+      }, `GO — Série ${state.setIndex + 1}`)
     );
   }
 
-  return wrap;
-}
-
-function parsePrimaryReps(target) {
-  const match = String(target).match(/\d+/);
-  return match ? parseInt(match[0]) : 10;
-}
-function roundTo(v, step) {
-  return Math.round(v / step) * step;
-}
-
-function renderRest(program, session, exercise, exLog) {
-  const wrap = el("div", { class: "timer-wrap" });
-
-  const ring = el("div", { class: "timer-ring" });
-  const r = 100;
-  const circumference = 2 * Math.PI * r;
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 220 220");
-  const bg = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-  bg.setAttribute("class", "bg");
-  bg.setAttribute("cx", "110"); bg.setAttribute("cy", "110"); bg.setAttribute("r", r);
-  const fg = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-  fg.setAttribute("class", "fg");
-  fg.setAttribute("cx", "110"); fg.setAttribute("cy", "110"); fg.setAttribute("r", r);
-  fg.setAttribute("stroke-dasharray", String(circumference));
-  svg.appendChild(bg); svg.appendChild(fg);
-  ring.appendChild(svg);
-
-  const timeLabel = el("div", { class: "timer-ring__time" }, "0:00");
-  ring.appendChild(el("div", { class: "timer-ring__label" }, [timeLabel, el("div", { class: "timer-ring__caption" }, "repos")]));
-  wrap.appendChild(el("div", { class: "exercise-title", style: "font-size:1.2rem;" }, exercise.name));
-  wrap.appendChild(ring);
-
-  const doneMsg = el("div", { class: "text-center", style: "min-height:1.3em;" });
-  wrap.appendChild(doneMsg);
-
-  const controls = el("div", { class: "timer-controls" });
-  const minus15 = el("button", { class: "btn btn--ghost", onclick: () => { sessionTimer?.addSeconds(-15); } }, "−15s");
-  const plus15 = el("button", { class: "btn btn--ghost", onclick: () => { sessionTimer?.addSeconds(15); } }, "+15s");
-  const skipBtn = el("button", { class: "btn btn--danger", onclick: () => sessionTimer?.skip() }, "Passer le repos");
-  controls.appendChild(minus15);
-  controls.appendChild(plus15);
-  controls.appendChild(skipBtn);
-  wrap.appendChild(controls);
-
-  const nextBtn = el("button", {
-    class: "btn btn--primary btn--lg btn--block hidden",
-    onclick: () => advanceAfterRest(program, session),
-  }, "Série suivante →");
-  wrap.appendChild(nextBtn);
-
-  sessionTimer = new RestTimer({
-    onTick: (remainingMs, durationMs) => {
-      timeLabel.textContent = formatTime(remainingMs);
-      const progress = 1 - remainingMs / durationMs;
-      fg.setAttribute("stroke-dashoffset", String(circumference * (1 - progress)));
-    },
-    onDone: () => {
-      ring.classList.add("is-done");
-      timeLabel.textContent = "0:00";
-      doneMsg.textContent = "Repos terminé — série comptée ✓";
-      playBeep();
-      vibrate([200, 100, 200, 100, 400]);
-      minus15.disabled = true;
-      plus15.disabled = true;
-      skipBtn.classList.add("hidden");
-      nextBtn.classList.remove("hidden");
-      if (!session.restConsumed) {
-        session.restConsumed = true;
-        session.setIndex += 1;
-        Store.setActive(session);
-      }
-      const isLastExercise = session.exerciseIndex >= program.exercises.length - 1;
-      const isLastSet = session.setIndex >= exercise.targetSets;
-      if (isLastSet && !isLastExercise) {
-        nextBtn.textContent = `${program.exercises[session.exerciseIndex + 1].name} →`;
-      } else if (isLastSet && isLastExercise) {
-        nextBtn.textContent = "Voir le résumé →";
-      }
-    },
-  });
-
-  if (session.restEndsAt && session.restEndsAt > Date.now()) {
-    sessionTimer.resume(session.restEndsAt, session.restDurationMs);
-  } else if (session.restEndsAt) {
-    // le chrono s'est terminé pendant que l'app était fermée / en arrière-plan
-    sessionTimer.done = true;
-    fg.setAttribute("stroke-dashoffset", "0");
-    ring.classList.add("is-done");
-    timeLabel.textContent = "0:00";
-    doneMsg.textContent = "Repos terminé — série comptée ✓";
-    minus15.disabled = true;
-    plus15.disabled = true;
-    skipBtn.classList.add("hidden");
-    nextBtn.classList.remove("hidden");
-    if (!session.restConsumed) {
-      session.restConsumed = true;
-      session.setIndex += 1;
-      Store.setActive(session);
-    }
-    const isLastExercise2 = session.exerciseIndex >= program.exercises.length - 1;
-    const isLastSet2 = session.setIndex >= exercise.targetSets;
-    if (isLastSet2 && !isLastExercise2) {
-      nextBtn.textContent = `${program.exercises[session.exerciseIndex + 1].name} →`;
-    } else if (isLastSet2 && isLastExercise2) {
-      nextBtn.textContent = "Voir le résumé →";
-    }
+  function renderArmedButton() {
+    actionSlot.innerHTML = "";
+    actionSlot.appendChild(
+      el("button", {
+        class: "btn btn--armed btn--lg btn--block",
+        onclick: () => {
+          exLog.sets.push({ weight, reps, ts: new Date().toISOString() });
+          state.phase = "resting";
+          state.armedWeight = null;
+          state.armedReps = null;
+          state.restConsumed = false;
+          state.restDurationMs = exercise.restSeconds * 1000;
+          state.restEndsAt = Date.now() + state.restDurationMs;
+          Store.setActive(session);
+          renderTimerBar();
+        },
+      }, "Fin de série — Repos")
+    );
   }
 
-  return wrap;
-}
+  function renderTimerBar() {
+    actionSlot.innerHTML = "";
+    const bar = el("div", { class: "timerbar" });
+    const fill = el("div", { class: "timerbar__fill" });
+    const label = el("div", { class: "timerbar__label" }, "0:00");
+    bar.appendChild(fill);
+    bar.appendChild(label);
+    actionSlot.appendChild(bar);
 
-function advanceAfterRest(program, session) {
-  sessionTimer?.stop();
-  const exercise = program.exercises[session.exerciseIndex];
-  if (session.setIndex >= exercise.targetSets) {
-    session.exerciseIndex += 1;
-    session.setIndex = 0;
+    const skipBtn = el("button", { class: "btn btn--ghost btn--sm", style: "margin-top:8px; width:100%;", onclick: () => timer.skip() }, "Passer le repos");
+    actionSlot.appendChild(skipBtn);
+
+    const timer = new RestTimer({
+      onTick: (remainingMs, durationMs) => {
+        label.textContent = formatTime(remainingMs);
+        fill.style.width = `${Math.min(100, Math.max(0, (1 - remainingMs / durationMs) * 100))}%`;
+      },
+      onDone: () => {
+        fill.style.width = "100%";
+        bar.classList.add("is-done");
+        skipBtn.classList.add("hidden");
+        if (!state.restConsumed) {
+          state.restConsumed = true;
+          state.setIndex += 1;
+          state.phase = "idle";
+          state.restEndsAt = null;
+          state.restDurationMs = null;
+          Store.setActive(session);
+          playBeep();
+          vibrate([200, 100, 200, 100, 400]);
+        }
+        setTimeout(() => render(), 650);
+      },
+    });
+    activeTimers.push(timer);
+    timer.resume(state.restEndsAt, state.restDurationMs);
   }
-  session.phase = "work";
-  session.restEndsAt = null;
-  session.restDurationMs = null;
-  Store.setActive(session);
-  render();
+
+  if (state.phase === "resting" && state.restEndsAt) {
+    setSteppersDisabled(true);
+    renderTimerBar();
+  } else if (state.phase === "armed") {
+    setSteppersDisabled(true);
+    renderArmedButton();
+  } else {
+    renderGoButton();
+  }
+
+  return card;
 }
 
-function nextExercise(program, session) {
-  sessionTimer?.stop();
-  session.exerciseIndex += 1;
-  session.setIndex = 0;
-  session.phase = "work";
-  session.restEndsAt = null;
-  Store.setActive(session);
-  render();
-}
-
-function endSessionEarly(program, session) {
-  if (!confirm("Terminer la séance maintenant ? Les séries déjà notées seront enregistrées.")) return;
-  sessionTimer?.stop();
-  session.exerciseIndex = program.exercises.length;
+function finishSession(program, session, skipConfirm) {
+  if (!skipConfirm && !confirm("Terminer la séance maintenant ? Les séries déjà notées seront enregistrées.")) return;
+  session.finished = true;
   Store.setActive(session);
   render();
 }
@@ -636,9 +837,12 @@ function renderSummary(program, session) {
   const detail = el("div", { class: "stack" });
   session.log.filter((e) => e.sets.length > 0).forEach((e) => {
     detail.appendChild(
-      el("div", { class: "card" }, [
-        el("div", { class: "program-card__name" }, e.name),
-        el("div", { class: "program-card__meta" }, e.sets.map((s) => `${s.weight}kg×${s.reps}`).join(" · ")),
+      el("div", { class: "card exercise-row-inline" }, [
+        muscleBadge(e.muscle, "sm"),
+        el("div", { class: "stack", style: "gap:4px;" }, [
+          el("div", { class: "program-card__name" }, e.name),
+          el("div", { class: "program-card__meta" }, e.sets.map((s) => `${s.weight}kg×${s.reps}`).join(" · ")),
+        ]),
       ])
     );
   });
@@ -783,6 +987,7 @@ function viewSettings() {
         localStorage.removeItem(Store.KEYS.programs);
         localStorage.removeItem(Store.KEYS.history);
         localStorage.removeItem(Store.KEYS.active);
+        localStorage.removeItem(Store.KEYS.schedule);
         toast("Données effacées");
         navigate("/");
       }
