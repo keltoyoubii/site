@@ -102,15 +102,53 @@ export const Store = {
   },
 };
 
-export const SEED_PROGRAM = {
-  id: "seed-full-body",
-  name: "Full Body — débutant",
-  exercises: [
-    { id: uid(), name: "Squat", targetSets: 4, targetReps: "8-10", restSeconds: 120, note: "" },
-    { id: uid(), name: "Développé couché", targetSets: 4, targetReps: "8-10", restSeconds: 120, note: "" },
-    { id: uid(), name: "Rowing barre", targetSets: 4, targetReps: "10-12", restSeconds: 90, note: "" },
-    { id: uid(), name: "Développé militaire", targetSets: 3, targetReps: "10-12", restSeconds: 90, note: "" },
-    { id: uid(), name: "Curl biceps", targetSets: 3, targetReps: "12-15", restSeconds: 60, note: "" },
-    { id: uid(), name: "Gainage", targetSets: 3, targetReps: "45s", restSeconds: 45, note: "" },
-  ],
-};
+export const SEED_PROGRAMS = [
+  {
+    id: "seed-full-body",
+    name: "Full Body — débutant",
+    exercises: [
+      { id: uid(), name: "Squat", targetSets: 4, targetReps: "8-10", restSeconds: 120, note: "" },
+      { id: uid(), name: "Développé couché", targetSets: 4, targetReps: "8-10", restSeconds: 120, note: "" },
+      { id: uid(), name: "Rowing barre", targetSets: 4, targetReps: "10-12", restSeconds: 90, note: "" },
+      { id: uid(), name: "Développé militaire", targetSets: 3, targetReps: "10-12", restSeconds: 90, note: "" },
+      { id: uid(), name: "Curl biceps", targetSets: 3, targetReps: "12-15", restSeconds: 60, note: "" },
+      { id: uid(), name: "Gainage", targetSets: 3, targetReps: "45s", restSeconds: 45, note: "" },
+    ],
+  },
+  {
+    id: "seed-ppl-push",
+    name: "Push — Pecs / Épaules / Triceps",
+    exercises: [
+      { id: uid(), name: "Développé couché", targetSets: 4, targetReps: "6-8", restSeconds: 150, note: "" },
+      { id: uid(), name: "Développé militaire haltères", targetSets: 3, targetReps: "8-10", restSeconds: 120, note: "" },
+      { id: uid(), name: "Élévations latérales", targetSets: 4, targetReps: "12-15", restSeconds: 60, note: "" },
+      { id: uid(), name: "Extension triceps à la poulie", targetSets: 3, targetReps: "12-15", restSeconds: 60, note: "" },
+      { id: uid(), name: "Rowing unilatéral haltère (rappel dos)", targetSets: 3, targetReps: "10-12", restSeconds: 75, note: "" },
+      { id: uid(), name: "Crunch à la poulie", targetSets: 3, targetReps: "15-20", restSeconds: 45, note: "" },
+    ],
+  },
+  {
+    id: "seed-ppl-pull",
+    name: "Pull — Dos / Biceps",
+    exercises: [
+      { id: uid(), name: "Tractions lestées", targetSets: 4, targetReps: "6-8", restSeconds: 150, note: "" },
+      { id: uid(), name: "Rowing unilatéral haltère", targetSets: 4, targetReps: "8-10", restSeconds: 90, note: "" },
+      { id: uid(), name: "Curl biceps barre EZ", targetSets: 3, targetReps: "10-12", restSeconds: 60, note: "" },
+      { id: uid(), name: "Oiseau haltères (deltoïde postérieur)", targetSets: 3, targetReps: "12-15", restSeconds: 60, note: "" },
+      { id: uid(), name: "Développé incliné haltères léger (rappel pecs)", targetSets: 3, targetReps: "10-12", restSeconds: 75, note: "" },
+      { id: uid(), name: "Crunch à la poulie", targetSets: 3, targetReps: "15-20", restSeconds: 45, note: "" },
+    ],
+  },
+  {
+    id: "seed-ppl-legs",
+    name: "Legs — Jambes / Fessiers",
+    exercises: [
+      { id: uid(), name: "Squat", targetSets: 4, targetReps: "6-8", restSeconds: 150, note: "" },
+      { id: uid(), name: "Soulevé de terre roumain", targetSets: 3, targetReps: "8-10", restSeconds: 120, note: "" },
+      { id: uid(), name: "Presse à cuisses / fentes marchées", targetSets: 3, targetReps: "10-12", restSeconds: 90, note: "" },
+      { id: uid(), name: "Leg curl allongé", targetSets: 3, targetReps: "12-15", restSeconds: 75, note: "" },
+      { id: uid(), name: "Mollets debout", targetSets: 4, targetReps: "15-20", restSeconds: 45, note: "" },
+      { id: uid(), name: "Crunch à la poulie", targetSets: 3, targetReps: "15-20", restSeconds: 45, note: "" },
+    ],
+  },
+];
