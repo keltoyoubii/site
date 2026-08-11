@@ -1,6 +1,7 @@
-import { Store, SEED_PROGRAMS } from "./storage.js";
+import { Store, SEED_PROGRAMS, localDateKey } from "./storage.js";
 import { RestTimer, playBeep, vibrate, formatTime, requestWakeLock, releaseWakeLock } from "./timer.js";
 import { lineChart, barChart } from "./charts.js";
+import { MUSCLES, muscleBadge, inferMuscle } from "./muscles.js";
 
 const root = document.getElementById("app");
 
@@ -107,7 +108,12 @@ const VIEWS = {
   exercice: viewExerciseProgress,
   reglages: viewSettings,
   modeles: viewPresets,
+  calendrier: viewCalendar,
 };
+
+function uniqueMuscles(exercises) {
+  return [...new Set(exercises.map((e) => e.muscle).filter(Boolean))];
+}
 
 /* --------- Home --------- */
 
@@ -155,10 +161,13 @@ function viewHome() {
   } else {
     programs.forEach((p) => {
       const nSets = p.exercises.reduce((s, e) => s + e.targetSets, 0);
+      const badgeRow = el("div", { class: "muscle-badge-row" });
+      uniqueMuscles(p.exercises).forEach((m) => badgeRow.appendChild(muscleBadge(m, "sm")));
       list.appendChild(
         el("div", { class: "card program-card" }, [
           el("div", { class: "program-card__name" }, p.name),
           el("div", { class: "program-card__meta" }, `${p.exercises.length} exercices · ${nSets} séries au total`),
+          badgeRow.children.length ? badgeRow : null,
           el("div", { class: "program-card__actions" }, [
             el("button", { class: "btn btn--primary", onclick: () => startSession(p.id) }, "▶ Commencer"),
             el("button", { class: "btn btn--ghost btn--sm", onclick: () => navigate(`/programme/${p.id}`) }, "Modifier"),
@@ -174,6 +183,7 @@ function viewHome() {
     view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/modeles") }, "📋 Modèles (Full Body, Push/Pull/Legs...)"));
   }
 
+  view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/calendrier") }, "📅 Calendrier"));
   view.appendChild(el("button", { class: "btn btn--ghost btn--block", onclick: () => navigate("/historique") }, "📈 Historique & progression"));
 
   return view;
@@ -188,10 +198,13 @@ function viewPresets() {
   const list = el("div", { class: "stack" });
   SEED_PROGRAMS.forEach((preset) => {
     const nSets = preset.exercises.reduce((s, e) => s + e.targetSets, 0);
+    const badgeRow = el("div", { class: "muscle-badge-row" });
+    uniqueMuscles(preset.exercises).forEach((m) => badgeRow.appendChild(muscleBadge(m, "sm")));
     list.appendChild(
       el("div", { class: "card program-card" }, [
         el("div", { class: "program-card__name" }, preset.name),
         el("div", { class: "program-card__meta" }, `${preset.exercises.length} exercices · ${nSets} séries · ${preset.exercises.map((e) => e.name).join(", ")}`),
+        badgeRow,
         el("div", { class: "program-card__actions" }, [
           el("button", {
             class: "btn btn--primary",
@@ -219,10 +232,138 @@ function startSession(programId) {
   navigate(`/seance/${programId}`);
 }
 
+/* --------- Calendrier --------- */
+
+function viewCalendar() {
+  const view = el("div", { class: "view" });
+  view.appendChild(topbar({ title: "Calendrier", subtitle: "Planifie tes jours, suis tes séances.", back: () => navigate("/") }));
+
+  const viewedDate = new Date();
+  viewedDate.setDate(1);
+  let selectedKey = localDateKey(new Date());
+
+  const navRow = el("div", { class: "cal-nav" });
+  const monthLabel = el("div", { class: "cal-nav__label" });
+  const prevBtn = el("button", { class: "icon-btn", type: "button", "aria-label": "Mois précédent" }, "‹");
+  const nextBtn = el("button", { class: "icon-btn", type: "button", "aria-label": "Mois suivant" }, "›");
+  navRow.appendChild(prevBtn);
+  navRow.appendChild(monthLabel);
+  navRow.appendChild(nextBtn);
+  view.appendChild(navRow);
+
+  view.appendChild(el("div", { class: "cal-weekdays" }, ["L", "M", "M", "J", "V", "S", "D"].map((d) => el("span", {}, d))));
+
+  const grid = el("div", { class: "cal-grid" });
+  view.appendChild(grid);
+
+  const panelWrap = el("div", { class: "day-panel" });
+  view.appendChild(panelWrap);
+
+  function redrawGrid() {
+    monthLabel.textContent = viewedDate.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+    grid.innerHTML = "";
+    const year = viewedDate.getFullYear();
+    const month = viewedDate.getMonth();
+    const firstOfMonth = new Date(year, month, 1);
+    const offset = (firstOfMonth.getDay() + 6) % 7; // lundi = 0
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const todayKey = localDateKey(new Date());
+    const schedule = Store.getSchedule();
+
+    for (let i = 0; i < offset; i++) {
+      grid.appendChild(el("button", { class: "cal-cell", type: "button", disabled: "true" }, ""));
+    }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const key = localDateKey(new Date(year, month, day));
+      const hasSession = Store.sessionsOnDate(key).length > 0;
+      const hasPlan = !!schedule[key];
+      grid.appendChild(
+        el("button", {
+          class: `cal-cell${key === todayKey ? " is-today" : ""}${key === selectedKey ? " is-selected" : ""}`,
+          type: "button",
+          onclick: () => { selectedKey = key; redrawGrid(); redrawPanel(); },
+        }, [
+          el("span", {}, String(day)),
+          el("span", { class: `cal-cell__dot${hasSession ? " is-done" : hasPlan ? " is-planned" : ""}` }),
+        ])
+      );
+    }
+  }
+
+  function redrawPanel() {
+    panelWrap.innerHTML = "";
+    const d = new Date(`${selectedKey}T00:00:00`);
+    panelWrap.appendChild(el("div", { class: "day-panel__title" }, d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })));
+
+    const sessions = Store.sessionsOnDate(selectedKey);
+    if (sessions.length > 0) {
+      sessions.forEach((s) => {
+        const volume = s.exercises.reduce((sum, e) => sum + e.sets.reduce((s2, set) => s2 + set.weight * set.reps, 0), 0);
+        const nSets = s.exercises.reduce((sum, e) => sum + e.sets.length, 0);
+        panelWrap.appendChild(
+          el("div", { class: "card session-item" }, [
+            el("div", { class: "session-item__name" }, `✓ ${s.programName}`),
+            el("div", { class: "session-item__stats" }, [
+              el("span", {}, `${nSets} séries`),
+              el("span", {}, `${Math.round(volume).toLocaleString("fr-FR")} kg volume`),
+            ]),
+            el("div", { class: "stack", style: "gap:6px; margin-top:8px;" }, s.exercises.map((e) =>
+              el("div", { class: "exercise-row-inline" }, [
+                muscleBadge(e.muscle, "sm"),
+                el("div", { class: "program-card__meta" }, `${e.name} — ${e.sets.map((st) => `${st.weight}kg×${st.reps}`).join(", ")}`),
+              ])
+            )),
+          ])
+        );
+      });
+      return;
+    }
+
+    const schedule = Store.getSchedule();
+    const plannedProgram = schedule[selectedKey] ? Store.getProgram(schedule[selectedKey]) : null;
+
+    if (plannedProgram) {
+      panelWrap.appendChild(
+        el("div", { class: "card program-card" }, [
+          el("div", { class: "text-dim" }, "Programme prévu"),
+          el("div", { class: "program-card__name" }, plannedProgram.name),
+          el("div", { class: "program-card__actions" }, [
+            el("button", { class: "btn btn--primary", onclick: () => startSession(plannedProgram.id) }, "▶ Commencer maintenant"),
+            el("button", { class: "btn btn--ghost btn--sm", onclick: () => { Store.clearScheduledProgram(selectedKey); redrawGrid(); redrawPanel(); } }, "Retirer"),
+          ]),
+        ])
+      );
+      return;
+    }
+
+    const programs = Store.getPrograms();
+    if (programs.length === 0) {
+      panelWrap.appendChild(el("div", { class: "empty" }, "Crée d'abord un programme pour pouvoir planifier ce jour."));
+      return;
+    }
+    panelWrap.appendChild(el("div", { class: "text-dim" }, "Quel programme ce jour-là ?"));
+    const picker = el("div", { class: "chip-group" });
+    programs.forEach((p) => {
+      picker.appendChild(
+        el("button", { class: "chip", type: "button", onclick: () => { Store.setScheduledProgram(selectedKey, p.id); redrawGrid(); redrawPanel(); } }, p.name)
+      );
+    });
+    panelWrap.appendChild(picker);
+  }
+
+  prevBtn.addEventListener("click", () => { viewedDate.setMonth(viewedDate.getMonth() - 1); redrawGrid(); });
+  nextBtn.addEventListener("click", () => { viewedDate.setMonth(viewedDate.getMonth() + 1); redrawGrid(); });
+
+  redrawGrid();
+  redrawPanel();
+
+  return view;
+}
+
 /* --------- Program editor --------- */
 
 function blankExercise() {
-  return { id: Store.uid(), name: "", targetSets: 3, targetReps: "10", restSeconds: 90, note: "" };
+  return { id: Store.uid(), name: "", targetSets: 3, targetReps: "10", restSeconds: 90, note: "", muscle: null };
 }
 
 function viewProgramEditor(id) {
@@ -247,7 +388,24 @@ function viewProgramEditor(id) {
 
   function exerciseRow(ex, i) {
     const row = el("div", { class: "exercise-row" });
-    const nameField = el("input", { type: "text", placeholder: `Exercice ${i + 1}`, value: ex.name, oninput: (e) => (ex.name = e.target.value) });
+    let muscleManuallySet = !!ex.muscle;
+    const badge = muscleBadge(ex.muscle, "md");
+    const nameField = el("input", {
+      type: "text",
+      placeholder: `Exercice ${i + 1}`,
+      value: ex.name,
+      oninput: (e) => {
+        ex.name = e.target.value;
+        if (!muscleManuallySet) {
+          ex.muscle = inferMuscle(ex.name);
+          const fresh = muscleBadge(ex.muscle, "md");
+          badge.innerHTML = fresh.innerHTML;
+          badge.className = fresh.className;
+          badge.title = fresh.title || "";
+          muscleChips.querySelectorAll(".chip").forEach((c, idx) => c.classList.toggle("is-active", MUSCLES[idx].key === ex.muscle));
+        }
+      },
+    });
 
     row.appendChild(
       el("div", { class: "exercise-row__head" }, [
@@ -255,10 +413,25 @@ function viewProgramEditor(id) {
           el("button", { class: "btn btn--sm btn--ghost", disabled: i === 0 ? "true" : null, onclick: () => { [program.exercises[i - 1], program.exercises[i]] = [program.exercises[i], program.exercises[i - 1]]; renumberAndRedraw(); } }, "↑"),
           el("button", { class: "btn btn--sm btn--ghost", disabled: i === program.exercises.length - 1 ? "true" : null, onclick: () => { [program.exercises[i + 1], program.exercises[i]] = [program.exercises[i], program.exercises[i + 1]]; renumberAndRedraw(); } }, "↓"),
         ]),
+        badge,
         nameField,
         el("button", { class: "icon-btn", "aria-label": "Supprimer", onclick: () => { program.exercises.splice(i, 1); renumberAndRedraw(); } }, "✕"),
       ])
     );
+
+    const muscleChips = el("div", { class: "chip-group" }, MUSCLES.map((m) =>
+      el("button", { class: `chip${ex.muscle === m.key ? " is-active" : ""}`, type: "button", onclick: (e) => {
+        ex.muscle = m.key;
+        muscleManuallySet = true;
+        const fresh = muscleBadge(ex.muscle, "md");
+        badge.innerHTML = fresh.innerHTML;
+        badge.className = fresh.className;
+        badge.title = fresh.title;
+        e.currentTarget.parentElement.querySelectorAll(".chip").forEach((c) => c.classList.remove("is-active"));
+        e.currentTarget.classList.add("is-active");
+      } }, m.label)
+    ));
+    row.appendChild(el("label", { class: "field" }, ["Muscle ciblé", muscleChips]));
 
     const setsInput = el("input", { type: "number", min: "1", value: ex.targetSets, oninput: (e) => (ex.targetSets = Math.max(1, parseInt(e.target.value) || 1)) });
     const repsInput = el("input", { type: "text", value: ex.targetReps, placeholder: "8-10", oninput: (e) => (ex.targetReps = e.target.value) });
@@ -358,7 +531,7 @@ function viewSession(programId) {
       restEndsAt: null,
       restDurationMs: null,
       restConsumed: false,
-      log: program.exercises.map((ex) => ({ exerciseId: ex.id, name: ex.name, restSeconds: ex.restSeconds, sets: [] })),
+      log: program.exercises.map((ex) => ({ exerciseId: ex.id, name: ex.name, muscle: ex.muscle || null, restSeconds: ex.restSeconds, sets: [] })),
     };
     Store.setActive(session);
     requestWakeLock();
@@ -399,7 +572,12 @@ function viewSession(programId) {
 function renderWork(program, session, exercise, exLog) {
   const wrap = el("div", { class: "stack" });
 
-  wrap.appendChild(el("div", { class: "exercise-title" }, exercise.name));
+  wrap.appendChild(
+    el("div", { class: "exercise-title-row" }, [
+      muscleBadge(exercise.muscle, "lg"),
+      el("div", { class: "exercise-title" }, exercise.name),
+    ])
+  );
   wrap.appendChild(el("div", { class: "exercise-target" }, `${exercise.targetSets} séries × ${exercise.targetReps} reps · repos ${formatRest(exercise.restSeconds)}`));
 
   const dots = el("div", { class: "set-dots" });
@@ -502,7 +680,12 @@ function renderRest(program, session, exercise, exLog) {
 
   const timeLabel = el("div", { class: "timer-ring__time" }, "0:00");
   ring.appendChild(el("div", { class: "timer-ring__label" }, [timeLabel, el("div", { class: "timer-ring__caption" }, "repos")]));
-  wrap.appendChild(el("div", { class: "exercise-title", style: "font-size:1.2rem;" }, exercise.name));
+  wrap.appendChild(
+    el("div", { class: "exercise-title-row" }, [
+      muscleBadge(exercise.muscle, "sm"),
+      el("div", { class: "exercise-title", style: "font-size:1.2rem;" }, exercise.name),
+    ])
+  );
   wrap.appendChild(ring);
 
   const doneMsg = el("div", { class: "text-center", style: "min-height:1.3em;" });
@@ -636,9 +819,12 @@ function renderSummary(program, session) {
   const detail = el("div", { class: "stack" });
   session.log.filter((e) => e.sets.length > 0).forEach((e) => {
     detail.appendChild(
-      el("div", { class: "card" }, [
-        el("div", { class: "program-card__name" }, e.name),
-        el("div", { class: "program-card__meta" }, e.sets.map((s) => `${s.weight}kg×${s.reps}`).join(" · ")),
+      el("div", { class: "card exercise-row-inline" }, [
+        muscleBadge(e.muscle, "sm"),
+        el("div", { class: "stack", style: "gap:4px;" }, [
+          el("div", { class: "program-card__name" }, e.name),
+          el("div", { class: "program-card__meta" }, e.sets.map((s) => `${s.weight}kg×${s.reps}`).join(" · ")),
+        ]),
       ])
     );
   });
@@ -783,6 +969,7 @@ function viewSettings() {
         localStorage.removeItem(Store.KEYS.programs);
         localStorage.removeItem(Store.KEYS.history);
         localStorage.removeItem(Store.KEYS.active);
+        localStorage.removeItem(Store.KEYS.schedule);
         toast("Données effacées");
         navigate("/");
       }
