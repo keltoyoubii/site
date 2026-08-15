@@ -1,7 +1,7 @@
 // Service worker : cache l'app shell pour un fonctionnement hors-ligne
 // (utile à la salle, réseau souvent capricieux).
 
-const CACHE = "muscu-v3";
+const CACHE = "muscu-v4";
 const ASSETS = [
   "./",
   "./index.html",
@@ -11,6 +11,7 @@ const ASSETS = [
   "./js/timer.js",
   "./js/charts.js",
   "./js/muscles.js",
+  "./js/exercises.js",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",

@@ -345,6 +345,33 @@ input[type="text"]:focus, input[type="number"]:focus { outline: 2px solid var(--
 .day-panel { display: flex; flex-direction: column; gap: 12px; }
 .day-panel__title { font-weight: 700; font-size: 1rem; text-transform: capitalize; }
 
+/* ---------- Modal ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-sheet {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  width: 100%;
+  max-width: 560px;
+  max-height: 82vh;
+  overflow-y: auto;
+  border-radius: 24px 24px 0 0;
+  padding: 18px 18px calc(18px + var(--safe-b));
+  animation: modal-slide-up 0.22s ease;
+}
+@keyframes modal-slide-up {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 /* ---------- Misc ---------- */
 .divider { height: 1px; background: var(--border); margin: 4px 0; }
 .text-dim { color: var(--text-dim); }
