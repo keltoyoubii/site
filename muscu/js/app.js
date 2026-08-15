@@ -2,6 +2,7 @@ import { Store, SEED_PROGRAMS, localDateKey } from "./storage.js";
 import { RestTimer, playBeep, vibrate, formatTime, requestWakeLock, releaseWakeLock } from "./timer.js";
 import { lineChart, barChart } from "./charts.js";
 import { MUSCLES, muscleBadge, inferMuscle } from "./muscles.js";
+import { EXERCISE_LIBRARY } from "./exercises.js";
 
 const root = document.getElementById("app");
 
@@ -43,6 +44,23 @@ function toast(msg) {
   el.classList.add("is-visible");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove("is-visible"), 2200);
+}
+
+/* ============================== Modal ============================== */
+
+function openModal(sheetEl) {
+  const backdrop = document.createElement("div");
+  backdrop.className = "modal-backdrop";
+  const card = document.createElement("div");
+  card.className = "modal-sheet";
+  card.appendChild(sheetEl);
+  backdrop.appendChild(card);
+  function close() {
+    backdrop.remove();
+  }
+  backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close(); });
+  document.body.appendChild(backdrop);
+  return close;
 }
 
 /* ============================== Helpers ============================== */
@@ -437,6 +455,55 @@ function blankExercise() {
   return { id: Store.uid(), name: "", targetSets: 3, targetReps: "10", restSeconds: 90, note: "", muscle: null };
 }
 
+function openExercisePicker(onPick) {
+  let closeModal = () => {};
+
+  const header = el("div", { class: "row" }, [
+    el("div", { class: "topbar__title" }, "Choisir un exercice"),
+    el("button", { class: "icon-btn", type: "button", "aria-label": "Fermer", onclick: () => closeModal() }, "✕"),
+  ]);
+
+  const searchInput = el("input", { type: "text", placeholder: "Rechercher un exercice..." });
+
+  const customBtn = el("button", {
+    class: "btn btn--ghost btn--block",
+    type: "button",
+    onclick: () => { closeModal(); onPick(null); },
+  }, "+ Exercice personnalisé");
+
+  const listWrap = el("div", { class: "stack", style: "max-height: 50vh; overflow-y: auto; padding-right: 2px;" });
+
+  function redrawList() {
+    const q = searchInput.value.trim().toLowerCase();
+    listWrap.innerHTML = "";
+    let any = false;
+    MUSCLES.forEach((m) => {
+      const items = EXERCISE_LIBRARY.filter((ex) => ex.muscle === m.key && (!q || ex.name.toLowerCase().includes(q)));
+      if (items.length === 0) return;
+      any = true;
+      listWrap.appendChild(
+        el("div", { class: "row", style: "gap:8px; margin-top:10px;" }, [muscleBadge(m.key, "sm"), el("div", { class: "text-dim" }, m.label)])
+      );
+      items.forEach((ex) => {
+        listWrap.appendChild(
+          el("button", {
+            class: "btn btn--ghost btn--block",
+            style: "justify-content:flex-start;",
+            type: "button",
+            onclick: () => { closeModal(); onPick(ex); },
+          }, ex.name)
+        );
+      });
+    });
+    if (!any) listWrap.appendChild(el("div", { class: "text-dim text-center", style: "padding:20px;" }, "Aucun résultat"));
+  }
+  searchInput.addEventListener("input", redrawList);
+  redrawList();
+
+  const sheet = el("div", { class: "stack" }, [header, searchInput, customBtn, el("div", { class: "divider" }), listWrap]);
+  closeModal = openModal(sheet);
+}
+
 function viewProgramEditor(id) {
   const isNew = id === "new";
   const program = isNew
@@ -533,7 +600,17 @@ function viewProgramEditor(id) {
   renumberAndRedraw();
 
   view.appendChild(
-    el("button", { class: "btn btn--ghost btn--block", onclick: () => { program.exercises.push(blankExercise()); renumberAndRedraw(); } }, "+ Ajouter un exercice")
+    el("button", {
+      class: "btn btn--ghost btn--block",
+      onclick: () => openExercisePicker((picked) => {
+        if (picked) {
+          program.exercises.push({ id: Store.uid(), name: picked.name, muscle: picked.muscle, targetSets: 3, targetReps: "10", restSeconds: 90, note: "" });
+        } else {
+          program.exercises.push(blankExercise());
+        }
+        renumberAndRedraw();
+      }),
+    }, "+ Ajouter un exercice")
   );
 
   view.appendChild(el("div", { class: "divider" }));
