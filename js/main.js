@@ -199,15 +199,15 @@
     }
   }
 
-  /* -------------------- Logo : grand sur le hero, petit dans la nav -------------------- */
+  /* -------------------- Logo : suit le showreel du scroll jusqu'à la nav -------------------- */
   function setupLogoMorph() {
     const logo = document.querySelector(".nav__brand .logo-svg");
     if (!logo || prefersReduced) return;
-    // Deux états fixes (grand centré sur le hero / petit dans la nav), basculés
-    // au même seuil que la disparition du header, sans transition scrubbée au
-    // scroll — un simple saut. Auparavant desktop avait un morph continu (GSAP
-    // + ScrollTrigger scrub), retiré à la demande pour un comportement identique
-    // partout, plus simple et insensible aux resize intempestifs du scroll mobile.
+    // Suivi continu dès le premier pixel de scroll (comme "collé" au showreel),
+    // recalculé à chaque frame depuis la position RÉELLE du scroll — pas un
+    // tween GSAP rejoué depuis un état de départ mémorisé. C'est ce qui causait
+    // le flash au resize (barre d'adresse mobile) : ici, un resize ne fait que
+    // mettre à jour les valeurs cibles, jamais "rembobiner" l'animation.
     let big = { x: 0, y: 0, scale: 1 };
     function measure() {
       const prev = logo.style.transform;
@@ -223,8 +223,12 @@
     }
     function apply() {
       const y = window.scrollY || document.documentElement.scrollTop || 0;
-      const isHero = y <= hero.offsetHeight - 90;
-      logo.style.transform = isHero ? `translate(${big.x}px, ${big.y}px) scale(${big.scale})` : "";
+      const range = Math.max(hero.offsetHeight - 90, 1);
+      const t = Math.min(Math.max(y / range, 0), 1); // 0 = tout en haut (grand) → 1 = seuil (petit, dans la nav)
+      if (t >= 1) { logo.style.transform = ""; return; }
+      const k = 1 - t;
+      const scale = 1 + (big.scale - 1) * k;
+      logo.style.transform = `translate(${(big.x * k).toFixed(2)}px, ${(big.y * k).toFixed(2)}px) scale(${scale.toFixed(4)})`;
     }
     measure(); apply();
     window.addEventListener("scroll", apply, { passive: true });
