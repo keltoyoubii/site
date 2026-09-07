@@ -77,12 +77,15 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
 
 /* ------------------------------ Nav ------------------------------ */
 /* Visible uniquement sur le showreel d'accueil : pas de bandeau ensuite,
-   le fond du hero (hero__scrim) suffit à faire ressortir le blanc. */
+   le fond du hero (hero__scrim) suffit à faire ressortir le blanc.
+   Disparition instantanée (pas de fondu) : le logo saute lui aussi sans
+   transition au même instant — un fondu décalé le ferait voir tout petit
+   dans le coin pendant qu'il s'efface encore, ce qui ressemblait à un bug. */
 .nav {
   position: fixed; inset: 0 0 auto 0; z-index: 50;
   display: flex; align-items: center; justify-content: space-between;
   padding: clamp(1rem, 2.4vw, 1.6rem) var(--pad);
-  color: #fff; opacity: 1; transition: opacity 0.4s var(--ease);
+  color: #fff; opacity: 1;
 }
 .nav.is-hidden { opacity: 0; pointer-events: none; }
 
