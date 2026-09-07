@@ -20,13 +20,19 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--bg); overflow-x: hidden; width: 100%;
+}
+/* overflow-x doit être posé sur html ET body : certains navigateurs mobiles
+   (Safari iOS notamment) laissent le doigt glisser au-delà du body et
+   révèlent le fond de html (blanc par défaut) sinon. */
 
 body {
   background: var(--bg); color: var(--fg);
   font-family: var(--font-body); font-weight: 400;
   font-size: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem); line-height: 1.6;
-  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; overflow-x: hidden;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; overflow-x: hidden; width: 100%;
 }
 img, video { display: block; max-width: 100%; height: auto; }
 a { color: inherit; text-decoration: none; }

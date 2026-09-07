@@ -199,7 +199,42 @@
   /* -------------------- Morph du logo (centre géant -> nav) -------------------- */
   function setupLogoMorph() {
     const logo = document.querySelector(".nav__brand .logo-svg");
-    if (!logo || !hasGSAP || prefersReduced) return;
+    if (!logo || prefersReduced) return;
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+
+    if (isTouch || !hasGSAP) {
+      // Mobile/tactile : pas de morph continu scrubbé au scroll. Les navigateurs
+      // mobiles déclenchent des "resize" pendant le scroll (barre d'adresse qui
+      // se rétracte), ce qui recalculait le tween GSAP en plein milieu et faisait
+      // "flasher" le logo en grand au centre de l'écran. À la place : deux états
+      // fixes (grand sur le hero / petit dans la nav), basculés au même seuil que
+      // le nav blanc/noir, sans transition — un simple saut, pas de scrub.
+      let big = { x: 0, y: 0, scale: 1 };
+      function measure() {
+        const prev = logo.style.transform;
+        logo.style.transform = "none";
+        const base = logo.getBoundingClientRect();
+        logo.style.transform = prev;
+        const cx = base.left + base.width / 2, cy = base.top + base.height / 2;
+        big = {
+          x: window.innerWidth / 2 - cx,
+          y: window.innerHeight * 0.42 - cy,
+          scale: Math.min(window.innerWidth * 0.58 / base.width, window.innerHeight * 0.42 / base.height),
+        };
+      }
+      function apply() {
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        const isHero = y <= hero.offsetHeight - 90;
+        logo.style.transform = isHero ? `translate(${big.x}px, ${big.y}px) scale(${big.scale})` : "";
+      }
+      measure(); apply();
+      window.addEventListener("scroll", apply, { passive: true });
+      let rt;
+      window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { measure(); apply(); }, 200); });
+      return;
+    }
+
+    // Desktop (souris) : morph continu, scrubbé au scroll
     let tween;
     function build() {
       if (tween) { tween.scrollTrigger && tween.scrollTrigger.kill(); tween.kill(); }
