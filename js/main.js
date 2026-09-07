@@ -199,62 +199,37 @@
     }
   }
 
-  /* -------------------- Morph du logo (centre géant -> nav) -------------------- */
+  /* -------------------- Logo : grand sur le hero, petit dans la nav -------------------- */
   function setupLogoMorph() {
     const logo = document.querySelector(".nav__brand .logo-svg");
     if (!logo || prefersReduced) return;
-    const isTouch = window.matchMedia("(pointer: coarse)").matches;
-
-    if (isTouch || !hasGSAP) {
-      // Mobile/tactile : pas de morph continu scrubbé au scroll. Les navigateurs
-      // mobiles déclenchent des "resize" pendant le scroll (barre d'adresse qui
-      // se rétracte), ce qui recalculait le tween GSAP en plein milieu et faisait
-      // "flasher" le logo en grand au centre de l'écran. À la place : deux états
-      // fixes (grand sur le hero / petit dans la nav), basculés au même seuil que
-      // le nav blanc/noir, sans transition — un simple saut, pas de scrub.
-      let big = { x: 0, y: 0, scale: 1 };
-      function measure() {
-        const prev = logo.style.transform;
-        logo.style.transform = "none";
-        const base = logo.getBoundingClientRect();
-        logo.style.transform = prev;
-        const cx = base.left + base.width / 2, cy = base.top + base.height / 2;
-        big = {
-          x: window.innerWidth / 2 - cx,
-          y: window.innerHeight * 0.42 - cy,
-          scale: Math.min(window.innerWidth * 0.58 / base.width, window.innerHeight * 0.42 / base.height),
-        };
-      }
-      function apply() {
-        const y = window.scrollY || document.documentElement.scrollTop || 0;
-        const isHero = y <= hero.offsetHeight - 90;
-        logo.style.transform = isHero ? `translate(${big.x}px, ${big.y}px) scale(${big.scale})` : "";
-      }
-      measure(); apply();
-      window.addEventListener("scroll", apply, { passive: true });
-      let rt;
-      window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { measure(); apply(); }, 200); });
-      return;
-    }
-
-    // Desktop (souris) : morph continu, scrubbé au scroll
-    let tween;
-    function build() {
-      if (tween) { tween.scrollTrigger && tween.scrollTrigger.kill(); tween.kill(); }
-      gsap.set(logo, { clearProps: "transform" });
+    // Deux états fixes (grand centré sur le hero / petit dans la nav), basculés
+    // au même seuil que la disparition du header, sans transition scrubbée au
+    // scroll — un simple saut. Auparavant desktop avait un morph continu (GSAP
+    // + ScrollTrigger scrub), retiré à la demande pour un comportement identique
+    // partout, plus simple et insensible aux resize intempestifs du scroll mobile.
+    let big = { x: 0, y: 0, scale: 1 };
+    function measure() {
+      const prev = logo.style.transform;
+      logo.style.transform = "none";
       const base = logo.getBoundingClientRect();
+      logo.style.transform = prev;
       const cx = base.left + base.width / 2, cy = base.top + base.height / 2;
-      const tx = window.innerWidth / 2 - cx;
-      const ty = window.innerHeight * 0.42 - cy;
-      const scale = Math.min(window.innerWidth * 0.58 / base.width, window.innerHeight * 0.42 / base.height);
-      tween = gsap.fromTo(logo,
-        { x: tx, y: ty, scale: scale },
-        { x: 0, y: 0, scale: 1, ease: "none", immediateRender: true,
-          scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+      big = {
+        x: window.innerWidth / 2 - cx,
+        y: window.innerHeight * 0.42 - cy,
+        scale: Math.min(window.innerWidth * 0.58 / base.width, window.innerHeight * 0.42 / base.height),
+      };
     }
-    build();
+    function apply() {
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      const isHero = y <= hero.offsetHeight - 90;
+      logo.style.transform = isHero ? `translate(${big.x}px, ${big.y}px) scale(${big.scale})` : "";
+    }
+    measure(); apply();
+    window.addEventListener("scroll", apply, { passive: true });
     let rt;
-    window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(build, 200); });
+    window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { measure(); apply(); }, 200); });
   }
   if (document.querySelector(".nav__brand .logo-svg")) setupLogoMorph();
   else window.addEventListener("logo:ready", setupLogoMorph, { once: true });
