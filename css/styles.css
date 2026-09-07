@@ -76,15 +76,15 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
 @keyframes grain { 0%{transform:translate(0,0)} 20%{transform:translate(-3%,4%)} 40%{transform:translate(2%,-3%)} 60%{transform:translate(-2%,-2%)} 80%{transform:translate(3%,3%)} 100%{transform:translate(0,0)} }
 
 /* ------------------------------ Nav ------------------------------ */
+/* Visible uniquement sur le showreel d'accueil : pas de bandeau ensuite,
+   le fond du hero (hero__scrim) suffit à faire ressortir le blanc. */
 .nav {
   position: fixed; inset: 0 0 auto 0; z-index: 50;
   display: flex; align-items: center; justify-content: space-between;
   padding: clamp(1rem, 2.4vw, 1.6rem) var(--pad);
-  color: #fff; transition: color 0.4s var(--ease);
+  color: #fff; opacity: 1; transition: opacity 0.4s var(--ease);
 }
-.nav::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(var(--bg) 20%, transparent); opacity: 0; transition: opacity 0.4s var(--ease); }
-.nav.is-solid { color: var(--fg); }
-.nav.is-solid::before, .project-page .nav::before { opacity: 0.95; }
+.nav.is-hidden { opacity: 0; pointer-events: none; }
 
 .nav__brand { display: flex; align-items: center; }
 .logo-svg { display: block; width: clamp(80px, 8vw, 116px); height: auto; fill: currentColor; overflow: visible; }
@@ -101,6 +101,16 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
   .nav__links a { padding: 0.55rem 0.15rem; } /* zone de tap confortable */
   .nav__links a::after { bottom: 0.3rem; }
 }
+
+/* Retour discret : seul lien persistant une fois quitté le showreel
+   (accueil, une fois le nav caché) ou sur les pages projet (pas de nav du tout). */
+.back-link {
+  position: fixed; left: var(--pad); bottom: clamp(1rem, 3vh, 1.75rem); z-index: 40;
+  color: var(--fg-muted); opacity: 0; pointer-events: none;
+  transition: opacity 0.4s var(--ease), color 0.3s var(--ease);
+}
+.back-link.is-visible { opacity: 1; pointer-events: auto; }
+.back-link:hover { color: var(--fg); }
 
 /* ------------------------------ Hero / Showreel ------------------------------ */
 .hero { position: relative; min-height: 100dvh; overflow: hidden; color: #f4f3f0; }

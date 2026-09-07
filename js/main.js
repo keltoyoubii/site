@@ -172,12 +172,15 @@
     });
   });
 
-  /* -------------------- Nav : blanc/noir -------------------- */
+  /* -------------------- Nav : visible seulement sur le showreel -------------------- */
   const nav = document.getElementById("nav");
   const hero = document.querySelector(".hero");
+  const backLink = document.querySelector(".back-link");
   function updateNav() {
     const y = window.scrollY || document.documentElement.scrollTop || 0;
-    nav.classList.toggle("is-solid", y > hero.offsetHeight - 90);
+    const pastHero = y > hero.offsetHeight - 90;
+    nav.classList.toggle("is-hidden", pastHero);
+    if (backLink) backLink.classList.toggle("is-visible", pastHero);
   }
   window.addEventListener("scroll", updateNav, { passive: true });
   updateNav();

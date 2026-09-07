@@ -1,11 +1,8 @@
 /* =========================================================================
    Page projet
    ========================================================================= */
-.project-page { padding-top: 0; }
-/* pages projet : fond clair du haut -> nav en noir */
-.project-page .nav { color: var(--fg); }
-
-.proj { max-width: var(--maxw); margin: 0 auto; padding: clamp(6rem, 16vh, 10rem) var(--pad) 0; }
+/* pas de header fixe à dégager : la page démarre directement sur le titre */
+.proj { max-width: var(--maxw); margin: 0 auto; padding: clamp(3.5rem, 9vh, 6rem) var(--pad) 0; }
 
 /* En-tête éditorial : titre + méta mono + description */
 .proj__head { display: grid; grid-template-columns: repeat(12, 1fr); gap: clamp(1.5rem, 3vw, 3rem); align-items: end; padding-bottom: clamp(2.5rem, 6vh, 4.5rem); }
