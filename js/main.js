@@ -196,41 +196,6 @@
     }
   }
 
-  /* -------------------- Logo : deux états francs, sans morph -------------------- */
-  function setupLogoMorph() {
-    const logo = document.querySelector(".nav__brand .logo-svg");
-    if (!logo || prefersReduced) return;
-    // Pas d'interpolation : le logo est soit grand et centré sur le showreel,
-    // soit petit dans son coin — jamais entre les deux. Bascule au même
-    // instant que le nav (même seuil), recalculé depuis la position réelle
-    // du scroll à chaque fois (pas un tween rejoué), donc insensible aux
-    // resize intempestifs du scroll mobile (barre d'adresse qui se rétracte).
-    let big = { x: 0, y: 0, scale: 1 };
-    function measure() {
-      const prev = logo.style.transform;
-      logo.style.transform = "none";
-      const base = logo.getBoundingClientRect();
-      logo.style.transform = prev;
-      const cx = base.left + base.width / 2, cy = base.top + base.height / 2;
-      big = {
-        x: window.innerWidth / 2 - cx,
-        y: window.innerHeight * 0.42 - cy,
-        scale: Math.min(window.innerWidth * 0.58 / base.width, window.innerHeight * 0.42 / base.height),
-      };
-    }
-    function apply() {
-      const y = window.scrollY || document.documentElement.scrollTop || 0;
-      const isHero = y <= hero.offsetHeight - 90;
-      logo.style.transform = isHero ? `translate(${big.x}px, ${big.y}px) scale(${big.scale})` : "";
-    }
-    measure(); apply();
-    window.addEventListener("scroll", apply, { passive: true });
-    let rt;
-    window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { measure(); apply(); }, 200); });
-  }
-  if (document.querySelector(".nav__brand .logo-svg")) setupLogoMorph();
-  else window.addEventListener("logo:ready", setupLogoMorph, { once: true });
-
   /* -------------------- Sans motion -------------------- */
   if (prefersReduced || !hasGSAP) {
     document.querySelectorAll("[data-reveal]").forEach((el) => el.classList.add("is-revealed"));

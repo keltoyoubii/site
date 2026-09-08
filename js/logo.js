@@ -1,6 +1,7 @@
 /* =========================================================================
    Logo : injection inline (pour animer les lettres) + flottement + répulsion
-   au curseur. Émet "logo:ready" quand injecté (pour le morph dans main.js).
+   au curseur. Gère chaque [data-logo] trouvé indépendamment (le grand logo
+   du hero et le petit du header en ont chacun un, positionnés en CSS).
    ========================================================================= */
 (function () {
   "use strict";
@@ -23,9 +24,8 @@
         svg.classList.add("logo-svg");
         setupFloat(svg);
       });
-      window.dispatchEvent(new Event("logo:ready"));
     })
-    .catch(() => { window.dispatchEvent(new Event("logo:ready")); });
+    .catch(() => {});
 
   function setupFloat(svg) {
     const paths = Array.from(svg.querySelectorAll("path"));

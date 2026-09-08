@@ -77,18 +77,20 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
 
 /* ------------------------------ Nav ------------------------------ */
 /* Deux états francs, sans transition : transparent sur le showreel (texte
-   blanc, logo grand centré) -> bande blanche pleine dès qu'on ne voit plus
-   la vidéo (texte sombre, logo petit dans son coin). Le logo bascule au
-   même instant (voir setupLogoMorph), pas de fondu ni de morph d'échelle. */
+   blanc) -> bande blanche pleine, fine, dès qu'on ne voit plus la vidéo
+   (texte sombre). Le petit logo du header n'existe QUE dans cet état : le
+   grand logo visible sur la vidéo est un élément à part, ancré dans le
+   hero (.hero__logo), qui défile et disparaît avec elle — voir plus bas. */
 .nav {
   position: fixed; inset: 0 0 auto 0; z-index: 50;
   display: flex; align-items: center; justify-content: space-between;
-  padding: clamp(1rem, 2.4vw, 1.6rem) var(--pad);
+  padding: clamp(0.6rem, 1.4vw, 1rem) var(--pad);
   color: #fff; background: transparent;
 }
-.nav.is-solid { background: var(--bg); color: var(--fg); border-bottom: 1px solid var(--line-soft); }
+.nav.is-solid { background: var(--bg); color: var(--fg); }
 
-.nav__brand { display: flex; align-items: center; }
+.nav__brand { display: flex; align-items: center; visibility: hidden; }
+.nav.is-solid .nav__brand { visibility: visible; }
 .logo-svg { display: block; width: clamp(80px, 8vw, 116px); height: auto; fill: currentColor; overflow: visible; }
 .logo-svg path { fill: currentColor; }
 
@@ -110,6 +112,14 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
 .hero__video-wrap { position: absolute; inset: 0; overflow: hidden; }
 .hero__video-wrap iframe { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 100vw; height: 56.25vw; min-width: 177.78vh; min-height: 100vh; border: 0; pointer-events: none; }
 .hero__scrim { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 45%, rgba(0,0,0,0.2) 100%); }
+
+/* Grand logo "collé" à la vidéo : élément normal du hero (position: absolute
+   dans .hero, position: relative), il défile avec elle dès le premier pixel
+   de scroll et disparaît en même temps qu'elle — pas de position: fixed, pas
+   de recalcul JS. Le petit logo du header (position: fixed) prend le relais
+   une fois la bande blanche affichée (.nav.is-solid). */
+.hero__logo { position: absolute; left: 50%; top: 42%; z-index: 1; transform: translate(-50%, -50%); width: max(200px, min(58vw, 86vh, 820px)); }
+.hero__logo .logo-svg { width: 100%; }
 
 .hero__baseline { position: absolute; left: 0; right: 0; top: 61%; z-index: 1; margin: 0; text-align: center; padding: 0 var(--pad); font-family: var(--font-title); font-weight: 300; font-size: clamp(0.68rem, 1.1vw, 0.92rem); text-transform: uppercase; letter-spacing: 0.24em; text-shadow: 0 1px 20px rgba(0,0,0,0.35); }
 .hero__scroll { position: absolute; left: 50%; transform: translateX(-50%); bottom: clamp(1.5rem, 4vh, 2.5rem); z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
