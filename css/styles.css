@@ -76,18 +76,17 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
 @keyframes grain { 0%{transform:translate(0,0)} 20%{transform:translate(-3%,4%)} 40%{transform:translate(2%,-3%)} 60%{transform:translate(-2%,-2%)} 80%{transform:translate(3%,3%)} 100%{transform:translate(0,0)} }
 
 /* ------------------------------ Nav ------------------------------ */
-/* Visible uniquement sur le showreel d'accueil : pas de bandeau ensuite,
-   le fond du hero (hero__scrim) suffit à faire ressortir le blanc.
-   Disparition instantanée (pas de fondu) : le logo saute lui aussi sans
-   transition au même instant — un fondu décalé le ferait voir tout petit
-   dans le coin pendant qu'il s'efface encore, ce qui ressemblait à un bug. */
+/* Deux états francs, sans transition : transparent sur le showreel (texte
+   blanc, logo grand centré) -> bande blanche pleine dès qu'on ne voit plus
+   la vidéo (texte sombre, logo petit dans son coin). Le logo bascule au
+   même instant (voir setupLogoMorph), pas de fondu ni de morph d'échelle. */
 .nav {
   position: fixed; inset: 0 0 auto 0; z-index: 50;
   display: flex; align-items: center; justify-content: space-between;
   padding: clamp(1rem, 2.4vw, 1.6rem) var(--pad);
-  color: #fff; opacity: 1;
+  color: #fff; background: transparent;
 }
-.nav.is-hidden { opacity: 0; pointer-events: none; }
+.nav.is-solid { background: var(--bg); color: var(--fg); border-bottom: 1px solid var(--line-soft); }
 
 .nav__brand { display: flex; align-items: center; }
 .logo-svg { display: block; width: clamp(80px, 8vw, 116px); height: auto; fill: currentColor; overflow: visible; }
@@ -104,16 +103,6 @@ html.js.is-leaving body { opacity: 0; transition: opacity 0.32s ease; }
   .nav__links a { padding: 0.55rem 0.15rem; } /* zone de tap confortable */
   .nav__links a::after { bottom: 0.3rem; }
 }
-
-/* Retour discret : seul lien persistant une fois quitté le showreel
-   (accueil, une fois le nav caché) ou sur les pages projet (pas de nav du tout). */
-.back-link {
-  position: fixed; left: var(--pad); bottom: clamp(1rem, 3vh, 1.75rem); z-index: 40;
-  color: var(--fg-muted); opacity: 0; pointer-events: none;
-  transition: opacity 0.4s var(--ease), color 0.3s var(--ease);
-}
-.back-link.is-visible { opacity: 1; pointer-events: auto; }
-.back-link:hover { color: var(--fg); }
 
 /* ------------------------------ Hero / Showreel ------------------------------ */
 .hero { position: relative; min-height: 100dvh; overflow: hidden; color: #f4f3f0; }

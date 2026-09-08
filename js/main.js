@@ -172,15 +172,12 @@
     });
   });
 
-  /* -------------------- Nav : visible seulement sur le showreel -------------------- */
+  /* -------------------- Nav : transparent sur le showreel -> bande blanche ensuite -------------------- */
   const nav = document.getElementById("nav");
   const hero = document.querySelector(".hero");
-  const backLink = document.querySelector(".back-link");
   function updateNav() {
     const y = window.scrollY || document.documentElement.scrollTop || 0;
-    const pastHero = y > hero.offsetHeight - 90;
-    nav.classList.toggle("is-hidden", pastHero);
-    if (backLink) backLink.classList.toggle("is-visible", pastHero);
+    nav.classList.toggle("is-solid", y > hero.offsetHeight - 90);
   }
   window.addEventListener("scroll", updateNav, { passive: true });
   updateNav();
@@ -199,15 +196,15 @@
     }
   }
 
-  /* -------------------- Logo : suit le showreel du scroll jusqu'à la nav -------------------- */
+  /* -------------------- Logo : deux états francs, sans morph -------------------- */
   function setupLogoMorph() {
     const logo = document.querySelector(".nav__brand .logo-svg");
     if (!logo || prefersReduced) return;
-    // Suivi continu dès le premier pixel de scroll (comme "collé" au showreel),
-    // recalculé à chaque frame depuis la position RÉELLE du scroll — pas un
-    // tween GSAP rejoué depuis un état de départ mémorisé. C'est ce qui causait
-    // le flash au resize (barre d'adresse mobile) : ici, un resize ne fait que
-    // mettre à jour les valeurs cibles, jamais "rembobiner" l'animation.
+    // Pas d'interpolation : le logo est soit grand et centré sur le showreel,
+    // soit petit dans son coin — jamais entre les deux. Bascule au même
+    // instant que le nav (même seuil), recalculé depuis la position réelle
+    // du scroll à chaque fois (pas un tween rejoué), donc insensible aux
+    // resize intempestifs du scroll mobile (barre d'adresse qui se rétracte).
     let big = { x: 0, y: 0, scale: 1 };
     function measure() {
       const prev = logo.style.transform;
@@ -223,12 +220,8 @@
     }
     function apply() {
       const y = window.scrollY || document.documentElement.scrollTop || 0;
-      const range = Math.max(hero.offsetHeight - 90, 1);
-      const t = Math.min(Math.max(y / range, 0), 1); // 0 = tout en haut (grand) → 1 = seuil (petit, dans la nav)
-      if (t >= 1) { logo.style.transform = ""; return; }
-      const k = 1 - t;
-      const scale = 1 + (big.scale - 1) * k;
-      logo.style.transform = `translate(${(big.x * k).toFixed(2)}px, ${(big.y * k).toFixed(2)}px) scale(${scale.toFixed(4)})`;
+      const isHero = y <= hero.offsetHeight - 90;
+      logo.style.transform = isHero ? `translate(${big.x}px, ${big.y}px) scale(${big.scale})` : "";
     }
     measure(); apply();
     window.addEventListener("scroll", apply, { passive: true });
