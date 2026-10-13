@@ -36,26 +36,42 @@ export class RestTimer {
   addSeconds(delta) {
     if (!this.endsAt) return;
     this.endsAt += delta * 1000;
+    this._scheduleFallback();
   }
 
   skip() {
     this.stop();
-    this.done = true;
-    this.onDone?.();
+    this._finish();
   }
 
   stop() {
     if (this.raf) cancelAnimationFrame(this.raf);
+    if (this.fallback) clearTimeout(this.fallback);
     this.raf = null;
+    this.fallback = null;
+  }
+
+  _finish() {
+    if (this.done) return;
+    this.done = true;
+    this.stop();
+    this.onDone?.();
+  }
+
+  // requestAnimationFrame est suspendu quand l'onglet passe en arrière-plan :
+  // ce setTimeout garantit que la fin du repos se déclenche quand même.
+  _scheduleFallback() {
+    if (this.fallback) clearTimeout(this.fallback);
+    this.fallback = setTimeout(() => this._finish(), Math.max(0, this.endsAt - Date.now()) + 50);
   }
 
   _loop() {
+    this._scheduleFallback();
     const tick = () => {
       const remainingMs = Math.max(0, this.endsAt - Date.now());
       this.onTick?.(remainingMs, this.durationMs);
       if (remainingMs <= 0) {
-        this.done = true;
-        this.onDone?.();
+        this._finish();
         return;
       }
       this.raf = requestAnimationFrame(tick);

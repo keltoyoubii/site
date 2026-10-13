@@ -1,4 +1,5 @@
-// Persistance locale (localStorage) — aucune donnée ne quitte l'appareil.
+// Persistance locale (localStorage) : aucune donnée ne quitte l'appareil.
+import { findLibraryExercise, canonicalName } from "./exercises.js";
 
 const KEYS = {
   programs: "muscu:programs",
@@ -98,9 +99,10 @@ export const Store = {
   },
 
   lastWeightFor(exerciseName) {
+    const target = canonicalName(exerciseName);
     const history = Store.getHistory();
     for (let i = history.length - 1; i >= 0; i--) {
-      const ex = history[i].exercises.find((e) => e.name === exerciseName);
+      const ex = history[i].exercises.find((e) => canonicalName(e.name) === target);
       if (ex && ex.sets.length) return ex.sets[ex.sets.length - 1].weight;
     }
     return null;
@@ -126,56 +128,112 @@ export const Store = {
     if (data.history) write(KEYS.history, data.history);
     if (data.settings) write(KEYS.settings, data.settings);
     if (data.schedule) write(KEYS.schedule, data.schedule);
+    Store.migrate();
+  },
+
+  // Remet à niveau les données déjà enregistrées sur l'appareil quand le
+  // format évolue. Idempotent : peut tourner à chaque démarrage.
+  migrate() {
+    const programs = Store.getPrograms();
+    let changed = false;
+    for (const p of programs) {
+      if (OLD_PROGRAM_NAMES[p.name]) {
+        p.name = OLD_PROGRAM_NAMES[p.name];
+        changed = true;
+      }
+      for (const ex of p.exercises) {
+        const rappel = (ex.name.match(/\((rappel [^)]+)\)/i) || [])[1];
+        const lib = findLibraryExercise(ex.name);
+        if (lib && (ex.name !== lib.name || ex.pattern !== lib.pattern)) {
+          ex.name = lib.name;
+          ex.pattern = lib.pattern;
+          ex.muscle = ex.muscle || lib.muscle;
+          changed = true;
+        }
+        if (rappel && !ex.note) {
+          ex.note = rappel.charAt(0).toUpperCase() + rappel.slice(1);
+          changed = true;
+        }
+      }
+    }
+    if (changed) write(KEYS.programs, programs);
+
+    const history = Store.getHistory();
+    let historyChanged = false;
+    for (const s of history) {
+      if (OLD_PROGRAM_NAMES[s.programName]) {
+        s.programName = OLD_PROGRAM_NAMES[s.programName];
+        historyChanged = true;
+      }
+    }
+    if (historyChanged) write(KEYS.history, history);
   },
 };
+
+const OLD_PROGRAM_NAMES = {
+  "Full Body — débutant": "Full body",
+  "Push — Pecs / Épaules / Triceps": "Push",
+  "Pull — Dos / Biceps": "Pull",
+  "Legs — Jambes / Fessiers": "Legs",
+};
+
+// Exercice de programme construit depuis la bibliothèque.
+function lib(name, targetSets, targetReps, restSeconds, note = "") {
+  const ex = findLibraryExercise(name);
+  return { id: uid(), name: ex.name, muscle: ex.muscle, pattern: ex.pattern, targetSets, targetReps, restSeconds, note };
+}
 
 export const SEED_PROGRAMS = [
   {
     id: "seed-full-body",
-    name: "Full Body — débutant",
+    name: "Full body",
+    description: "Tout le corps en une séance, idéal pour débuter.",
     exercises: [
-      { id: uid(), name: "Squat", targetSets: 4, targetReps: "8-10", restSeconds: 120, note: "", muscle: "legs" },
-      { id: uid(), name: "Développé couché", targetSets: 4, targetReps: "8-10", restSeconds: 120, note: "", muscle: "chest" },
-      { id: uid(), name: "Rowing barre", targetSets: 4, targetReps: "10-12", restSeconds: 90, note: "", muscle: "back" },
-      { id: uid(), name: "Développé militaire", targetSets: 3, targetReps: "10-12", restSeconds: 90, note: "", muscle: "shoulders" },
-      { id: uid(), name: "Curl biceps", targetSets: 3, targetReps: "12-15", restSeconds: 60, note: "", muscle: "biceps" },
-      { id: uid(), name: "Gainage", targetSets: 3, targetReps: "45s", restSeconds: 45, note: "", muscle: "abs" },
+      lib("Squat (barre)", 4, "8-10", 120),
+      lib("Développé couché (barre)", 4, "8-10", 120),
+      lib("Rowing barre", 4, "10-12", 90),
+      lib("Développé militaire (barre)", 3, "10-12", 90),
+      lib("Curl biceps (barre droite)", 3, "12-15", 60),
+      lib("Gainage (planche)", 3, "45s", 45),
     ],
   },
   {
     id: "seed-ppl-push",
-    name: "Push — Pecs / Épaules / Triceps",
+    name: "Push",
+    description: "Pecs, épaules, triceps.",
     exercises: [
-      { id: uid(), name: "Développé couché", targetSets: 4, targetReps: "6-8", restSeconds: 150, note: "", muscle: "chest" },
-      { id: uid(), name: "Développé militaire haltères", targetSets: 3, targetReps: "8-10", restSeconds: 120, note: "", muscle: "shoulders" },
-      { id: uid(), name: "Élévations latérales", targetSets: 4, targetReps: "12-15", restSeconds: 60, note: "", muscle: "shoulders" },
-      { id: uid(), name: "Extension triceps à la poulie", targetSets: 3, targetReps: "12-15", restSeconds: 60, note: "", muscle: "triceps" },
-      { id: uid(), name: "Rowing unilatéral haltère (rappel dos)", targetSets: 3, targetReps: "10-12", restSeconds: 75, note: "", muscle: "back" },
-      { id: uid(), name: "Crunch à la poulie", targetSets: 3, targetReps: "15-20", restSeconds: 45, note: "", muscle: "abs" },
+      lib("Développé couché (barre)", 4, "6-8", 150),
+      lib("Développé militaire (haltères)", 3, "8-10", 120),
+      lib("Élévations latérales (haltères)", 4, "12-15", 60),
+      lib("Extension triceps à la poulie (corde)", 3, "12-15", 60),
+      lib("Rowing haltère unilatéral", 3, "10-12", 75, "Rappel dos"),
+      lib("Crunch à la poulie", 3, "15-20", 45, "Finisher"),
     ],
   },
   {
     id: "seed-ppl-pull",
-    name: "Pull — Dos / Biceps",
+    name: "Pull",
+    description: "Dos, biceps, arrière d'épaule.",
     exercises: [
-      { id: uid(), name: "Tractions lestées", targetSets: 4, targetReps: "6-8", restSeconds: 150, note: "", muscle: "back" },
-      { id: uid(), name: "Rowing unilatéral haltère", targetSets: 4, targetReps: "8-10", restSeconds: 90, note: "", muscle: "back" },
-      { id: uid(), name: "Curl biceps barre EZ", targetSets: 3, targetReps: "10-12", restSeconds: 60, note: "", muscle: "biceps" },
-      { id: uid(), name: "Oiseau haltères (deltoïde postérieur)", targetSets: 3, targetReps: "12-15", restSeconds: 60, note: "", muscle: "shoulders" },
-      { id: uid(), name: "Développé incliné haltères léger (rappel pecs)", targetSets: 3, targetReps: "10-12", restSeconds: 75, note: "", muscle: "chest" },
-      { id: uid(), name: "Crunch à la poulie", targetSets: 3, targetReps: "15-20", restSeconds: 45, note: "", muscle: "abs" },
+      lib("Tractions lestées", 4, "6-8", 150),
+      lib("Rowing haltère unilatéral", 4, "8-10", 90),
+      lib("Curl biceps (barre EZ)", 3, "10-12", 60),
+      lib("Oiseau (élévations arrière)", 3, "12-15", 60),
+      lib("Développé incliné (haltères)", 3, "10-12", 75, "Rappel pecs"),
+      lib("Crunch à la poulie", 3, "15-20", 45, "Finisher"),
     ],
   },
   {
     id: "seed-ppl-legs",
-    name: "Legs — Jambes / Fessiers",
+    name: "Legs",
+    description: "Quadriceps, ischios, fessiers, mollets.",
     exercises: [
-      { id: uid(), name: "Squat", targetSets: 4, targetReps: "6-8", restSeconds: 150, note: "", muscle: "legs" },
-      { id: uid(), name: "Soulevé de terre roumain", targetSets: 3, targetReps: "8-10", restSeconds: 120, note: "", muscle: "legs" },
-      { id: uid(), name: "Presse à cuisses / fentes marchées", targetSets: 3, targetReps: "10-12", restSeconds: 90, note: "", muscle: "legs" },
-      { id: uid(), name: "Leg curl allongé", targetSets: 3, targetReps: "12-15", restSeconds: 75, note: "", muscle: "legs" },
-      { id: uid(), name: "Mollets debout", targetSets: 4, targetReps: "15-20", restSeconds: 45, note: "", muscle: "legs" },
-      { id: uid(), name: "Crunch à la poulie", targetSets: 3, targetReps: "15-20", restSeconds: 45, note: "", muscle: "abs" },
+      lib("Squat (barre)", 4, "6-8", 150),
+      lib("Soulevé de terre roumain", 3, "8-10", 120),
+      lib("Presse à cuisses", 3, "10-12", 90),
+      lib("Leg curl allongé", 3, "12-15", 75),
+      lib("Mollets debout", 4, "15-20", 45),
+      lib("Crunch à la poulie", 3, "15-20", 45, "Finisher"),
     ],
   },
 ];

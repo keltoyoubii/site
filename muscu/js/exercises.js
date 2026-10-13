@@ -1,89 +1,129 @@
-// Bibliothèque d'exercices classiques de salle, groupés par muscle ciblé.
-// Volontairement composée des mouvements les plus courants (barre, haltères,
-// machines, poulie, poids du corps) — pas d'exercices exotiques.
+// Bibliothèque d'exercices classiques de salle (barre, haltères, machines,
+// poulie, poids du corps). Chaque exercice a un muscle principal et un type de
+// mouvement, qui sert à choisir son pictogramme.
+// `aliases` : anciens noms utilisés dans l'app, pour garder l'historique et la
+// progression rattachés au bon exercice.
+
+export const PATTERN_LABELS = {
+  "press-h": "Poussée horizontale",
+  fly: "Écarté",
+  "press-v": "Poussée verticale",
+  raise: "Élévation",
+  "pull-v": "Tirage vertical",
+  "pull-h": "Tirage horizontal",
+  curl: "Flexion du bras",
+  extension: "Extension du bras",
+  squat: "Squat",
+  leg: "Machine jambes",
+  lunge: "Fente",
+  "leg-curl": "Flexion de jambe",
+  calf: "Mollets",
+  core: "Gainage / abdos",
+};
+
+const E = (name, muscle, pattern, aliases = []) => ({ name, muscle, pattern, aliases });
 
 export const EXERCISE_LIBRARY = [
   // Pecs
-  { name: "Développé couché (barre)", muscle: "chest" },
-  { name: "Développé couché (haltères)", muscle: "chest" },
-  { name: "Développé incliné (barre)", muscle: "chest" },
-  { name: "Développé incliné (haltères)", muscle: "chest" },
-  { name: "Développé décliné", muscle: "chest" },
-  { name: "Écarté couché (haltères)", muscle: "chest" },
-  { name: "Écarté à la poulie vis-à-vis", muscle: "chest" },
-  { name: "Pec deck (écarté machine)", muscle: "chest" },
-  { name: "Presse à pecs (machine)", muscle: "chest" },
-  { name: "Dips (pecs)", muscle: "chest" },
-  { name: "Pompes", muscle: "chest" },
+  E("Développé couché (barre)", "chest", "press-h", ["Développé couché"]),
+  E("Développé couché (haltères)", "chest", "press-h"),
+  E("Développé incliné (barre)", "chest", "press-h"),
+  E("Développé incliné (haltères)", "chest", "press-h", ["Développé incliné haltères léger (rappel pecs)"]),
+  E("Développé décliné", "chest", "press-h"),
+  E("Presse à pecs (machine)", "chest", "press-h"),
+  E("Pompes", "chest", "press-h"),
+  E("Dips (pecs)", "chest", "press-h"),
+  E("Écarté couché (haltères)", "chest", "fly"),
+  E("Écarté à la poulie vis-à-vis", "chest", "fly"),
+  E("Pec deck (écarté machine)", "chest", "fly"),
 
   // Dos
-  { name: "Tractions (pronation)", muscle: "back" },
-  { name: "Tractions (supination)", muscle: "back" },
-  { name: "Tractions lestées", muscle: "back" },
-  { name: "Tirage vertical (poulie haute)", muscle: "back" },
-  { name: "Rowing barre", muscle: "back" },
-  { name: "Rowing haltère unilatéral", muscle: "back" },
-  { name: "Rowing T-bar", muscle: "back" },
-  { name: "Tirage horizontal (poulie basse)", muscle: "back" },
-  { name: "Rowing machine (assis)", muscle: "back" },
-  { name: "Soulevé de terre", muscle: "back" },
-  { name: "Hyperextensions lombaires", muscle: "back" },
-  { name: "Pull-over", muscle: "back" },
+  E("Tractions (pronation)", "back", "pull-v"),
+  E("Tractions (supination)", "back", "pull-v"),
+  E("Tractions lestées", "back", "pull-v"),
+  E("Tirage vertical (poulie haute)", "back", "pull-v"),
+  E("Pull-over", "back", "pull-v"),
+  E("Rowing barre", "back", "pull-h"),
+  E("Rowing haltère unilatéral", "back", "pull-h", ["Rowing unilatéral haltère", "Rowing unilatéral haltère (rappel dos)"]),
+  E("Rowing T-bar", "back", "pull-h"),
+  E("Rowing machine (assis)", "back", "pull-h"),
+  E("Tirage horizontal (poulie basse)", "back", "pull-h"),
+  E("Soulevé de terre", "back", "squat"),
+  E("Hyperextensions lombaires", "back", "squat"),
 
   // Épaules
-  { name: "Développé militaire (barre)", muscle: "shoulders" },
-  { name: "Développé militaire (haltères)", muscle: "shoulders" },
-  { name: "Développé Arnold", muscle: "shoulders" },
-  { name: "Presse à épaules (machine)", muscle: "shoulders" },
-  { name: "Élévations latérales (haltères)", muscle: "shoulders" },
-  { name: "Élévations latérales (poulie)", muscle: "shoulders" },
-  { name: "Élévations frontales", muscle: "shoulders" },
-  { name: "Oiseau (élévations arrière)", muscle: "shoulders" },
-  { name: "Rowing menton", muscle: "shoulders" },
-  { name: "Face pull (poulie)", muscle: "shoulders" },
+  E("Développé militaire (barre)", "shoulders", "press-v", ["Développé militaire"]),
+  E("Développé militaire (haltères)", "shoulders", "press-v", ["Développé militaire haltères"]),
+  E("Développé Arnold", "shoulders", "press-v"),
+  E("Presse à épaules (machine)", "shoulders", "press-v"),
+  E("Élévations latérales (haltères)", "shoulders", "raise", ["Élévations latérales"]),
+  E("Élévations latérales (poulie)", "shoulders", "raise"),
+  E("Élévations frontales", "shoulders", "raise"),
+  E("Oiseau (élévations arrière)", "shoulders", "raise", ["Oiseau haltères (deltoïde postérieur)"]),
+  E("Face pull (poulie)", "shoulders", "pull-h"),
+  E("Rowing menton", "shoulders", "pull-h"),
 
   // Biceps
-  { name: "Curl biceps (barre droite)", muscle: "biceps" },
-  { name: "Curl biceps (barre EZ)", muscle: "biceps" },
-  { name: "Curl haltères alterné", muscle: "biceps" },
-  { name: "Curl marteau", muscle: "biceps" },
-  { name: "Curl pupitre (banc Scott)", muscle: "biceps" },
-  { name: "Curl à la poulie basse", muscle: "biceps" },
-  { name: "Curl concentré", muscle: "biceps" },
+  E("Curl biceps (barre droite)", "biceps", "curl", ["Curl biceps"]),
+  E("Curl biceps (barre EZ)", "biceps", "curl", ["Curl biceps barre EZ"]),
+  E("Curl haltères alterné", "biceps", "curl"),
+  E("Curl marteau", "biceps", "curl"),
+  E("Curl pupitre (banc Scott)", "biceps", "curl"),
+  E("Curl à la poulie basse", "biceps", "curl"),
+  E("Curl concentré", "biceps", "curl"),
 
   // Triceps
-  { name: "Extension triceps à la poulie (corde)", muscle: "triceps" },
-  { name: "Extension triceps à la poulie (barre)", muscle: "triceps" },
-  { name: "Barre au front (skull crusher)", muscle: "triceps" },
-  { name: "Extension verticale haltère", muscle: "triceps" },
-  { name: "Développé couché prise serrée", muscle: "triceps" },
-  { name: "Dips (triceps)", muscle: "triceps" },
-  { name: "Kickback haltère", muscle: "triceps" },
+  E("Extension triceps à la poulie (corde)", "triceps", "extension", ["Extension triceps à la poulie"]),
+  E("Extension triceps à la poulie (barre)", "triceps", "extension"),
+  E("Barre au front (skull crusher)", "triceps", "extension"),
+  E("Extension verticale haltère", "triceps", "extension"),
+  E("Kickback haltère", "triceps", "extension"),
+  E("Développé couché prise serrée", "triceps", "press-h"),
+  E("Dips (triceps)", "triceps", "press-h"),
 
   // Jambes
-  { name: "Squat (barre)", muscle: "legs" },
-  { name: "Squat avant (front squat)", muscle: "legs" },
-  { name: "Presse à cuisses", muscle: "legs" },
-  { name: "Fentes (haltères ou barre)", muscle: "legs" },
-  { name: "Fentes marchées", muscle: "legs" },
-  { name: "Soulevé de terre roumain", muscle: "legs" },
-  { name: "Leg curl allongé", muscle: "legs" },
-  { name: "Leg curl assis", muscle: "legs" },
-  { name: "Leg extension", muscle: "legs" },
-  { name: "Hip thrust", muscle: "legs" },
-  { name: "Adducteurs (machine)", muscle: "legs" },
-  { name: "Abducteurs (machine)", muscle: "legs" },
-  { name: "Mollets debout", muscle: "legs" },
-  { name: "Mollets assis", muscle: "legs" },
+  E("Squat (barre)", "legs", "squat", ["Squat"]),
+  E("Squat avant (front squat)", "legs", "squat"),
+  E("Soulevé de terre roumain", "legs", "squat"),
+  E("Hip thrust", "legs", "squat"),
+  E("Presse à cuisses", "legs", "leg", ["Presse à cuisses / fentes marchées"]),
+  E("Leg extension", "legs", "leg"),
+  E("Adducteurs (machine)", "legs", "leg"),
+  E("Abducteurs (machine)", "legs", "leg"),
+  E("Fentes (haltères ou barre)", "legs", "lunge"),
+  E("Fentes marchées", "legs", "lunge"),
+  E("Squat bulgare", "legs", "lunge"),
+  E("Leg curl allongé", "legs", "leg-curl"),
+  E("Leg curl assis", "legs", "leg-curl"),
+  E("Mollets debout", "legs", "calf"),
+  E("Mollets assis", "legs", "calf"),
 
   // Abdos
-  { name: "Crunch au sol", muscle: "abs" },
-  { name: "Crunch à la poulie", muscle: "abs" },
-  { name: "Crunch machine", muscle: "abs" },
-  { name: "Relevé de jambes suspendu", muscle: "abs" },
-  { name: "Relevé de jambes au sol", muscle: "abs" },
-  { name: "Gainage (planche)", muscle: "abs" },
-  { name: "Planche latérale", muscle: "abs" },
-  { name: "Russian twist", muscle: "abs" },
-  { name: "Roulette abdo (ab wheel)", muscle: "abs" },
+  E("Crunch à la poulie", "abs", "core"),
+  E("Crunch au sol", "abs", "core"),
+  E("Crunch machine", "abs", "core"),
+  E("Relevé de jambes suspendu", "abs", "core"),
+  E("Relevé de jambes au sol", "abs", "core"),
+  E("Gainage (planche)", "abs", "core", ["Gainage"]),
+  E("Planche latérale", "abs", "core"),
+  E("Russian twist", "abs", "core"),
+  E("Roulette abdo (ab wheel)", "abs", "core"),
 ];
+
+const BY_NAME = new Map();
+for (const ex of EXERCISE_LIBRARY) {
+  BY_NAME.set(ex.name.toLowerCase(), ex);
+  for (const a of ex.aliases) BY_NAME.set(a.toLowerCase(), ex);
+}
+
+// Exercice de la bibliothèque correspondant à un nom (nom courant ou ancien nom).
+export function findLibraryExercise(name) {
+  return BY_NAME.get((name || "").trim().toLowerCase()) || null;
+}
+
+// Nom de référence d'un exercice : sert à regrouper l'historique d'un même
+// exercice même s'il a été renommé entre-temps.
+export function canonicalName(name) {
+  const ex = findLibraryExercise(name);
+  return ex ? ex.name : (name || "").trim();
+}
