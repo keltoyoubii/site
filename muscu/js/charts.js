@@ -1,4 +1,4 @@
-// Petits graphiques SVG faits main — pas de dépendance externe, marche hors-ligne.
+// Petits graphiques SVG sans dépendance externe : marchent hors ligne.
 
 function svgEl(tag, attrs) {
   const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
@@ -66,7 +66,7 @@ export function lineChart(points, { width = 640, height = 220, unit = "" } = {})
     const cy = yAt(p.y);
     const dot = svgEl("circle", { cx, cy, r: 4, class: "chart__dot" });
     const title = svgEl("title", {});
-    title.textContent = `${p.label || ""} — ${p.y}${unit}`;
+    title.textContent = `${p.label || ""} : ${p.y}${unit}`;
     dot.appendChild(title);
     svg.appendChild(dot);
 
@@ -104,7 +104,7 @@ export function barChart(points, { width = 640, height = 220, unit = "" } = {}) 
     const y = pad.top + innerH - barH;
     const rect = svgEl("rect", { x, y, width: barW, height: Math.max(barH, 1), class: "chart__bar", rx: 3 });
     const title = svgEl("title", {});
-    title.textContent = `${p.label || ""} — ${p.y}${unit}`;
+    title.textContent = `${p.label || ""} : ${p.y}${unit}`;
     rect.appendChild(title);
     svg.appendChild(rect);
 

@@ -1,13 +1,13 @@
 {
-  "name": "Muscu — Suivi de séance",
+  "name": "Muscu",
   "short_name": "Muscu",
   "description": "Programme, charges, séries et minuteur de repos pour la salle.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#101014",
-  "theme_color": "#101014",
+  "background_color": "#0b0b0c",
+  "theme_color": "#0b0b0c",
   "lang": "fr",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

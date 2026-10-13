@@ -1,7 +1,8 @@
-// Service worker : cache l'app shell pour un fonctionnement hors-ligne
-// (utile à la salle, réseau souvent capricieux).
+// Service worker : garde l'app utilisable hors ligne (réseau souvent
+// capricieux à la salle). Réseau d'abord pour afficher tout de suite la
+// dernière version, cache en secours quand il n'y a pas de connexion.
 
-const CACHE = "muscu-v4";
+const CACHE = "muscu-v5";
 const ASSETS = [
   "./",
   "./index.html",
@@ -12,6 +13,8 @@ const ASSETS = [
   "./js/charts.js",
   "./js/muscles.js",
   "./js/exercises.js",
+  "./js/icons.js",
+  "./fonts/Geist-Variable.woff2",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
@@ -32,16 +35,16 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+  if (event.request.method !== "GET" || new URL(event.request.url).origin !== self.location.origin) return;
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const network = fetch(event.request)
-        .then((res) => {
-          if (res.ok) caches.open(CACHE).then((cache) => cache.put(event.request, res.clone()));
-          return res;
-        })
-        .catch(() => cached);
-      return cached || network;
-    })
+    fetch(event.request)
+      .then((res) => {
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((cache) => cache.put(event.request, copy));
+        }
+        return res;
+      })
+      .catch(() => caches.match(event.request, { ignoreSearch: true }))
   );
 });
